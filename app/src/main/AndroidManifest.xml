@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.jaaaelu.gzw.neteasy.privatebook">
+
+    <!-- 网路权限 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 震动权限 -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- 相机权限 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- 开启闪光灯权限 -->
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    <!-- 使用照相机权限 -->
+    <uses-feature android:name="android.hardware.camera"/>
+    <!-- 自动聚焦权限 -->
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_airplay_black_24dp"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.HomeActivity"
+            android:label="@string/title_activity_home">
+        </activity>
+        <activity android:name=".activities.ScanBookActivity">
+        </activity>
+        <activity android:name="com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity"/>
+        <activity
+            android:name=".activities.BookDetailActivity"
+            android:label="@string/book_detail"
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity android:name=".activities.SearchBookActivity"
+                  android:windowSoftInputMode="stateHidden"  >
+        </activity>
+    </application>
+
+</manifest>

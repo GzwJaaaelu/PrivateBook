@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_my_book"
+        android:icon="@drawable/ic_my_book"
+        android:title="@string/title_my_book"/>
+
+    <item
+        android:id="@+id/navigation_scan_book"
+        android:icon="@drawable/ic_scan_book"
+        android:title="@string/title_find_book"/>
+
+    <item
+        android:id="@+id/navigation_book_statistics"
+        android:icon="@drawable/ic_book_statistics"
+        android:title="@string/title_book_statistics"/>
+
+</menu>

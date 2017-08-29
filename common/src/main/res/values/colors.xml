@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--主题颜色-->
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00796B</color>
+    <color name="colorAccent">#FFFFFF</color>
+
+    <!-- QRCode scanner color begin -->
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="result_view">#B0000000</color>
+    <color name="viewfinder_frame">#90FFFFFF</color>
+    <!-- QRCode scanner color end -->
+
+    <color name="textMainColor">#333333</color>
+    <color name="textsSecondColor">#666666</color>
+    <color name="textThirdColor">#999999</color>
+
+    <color name="alreadyCollectBook">#FFE9E9E9</color>
+</resources>

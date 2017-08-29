@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">common</string>
+    <string name="hint_private_book_nothing">暂时还没有藏书，快去添加要收藏图书吧！\n 可点击图片进行书名搜索或二维码扫描~</string>
+    <string name="contents_contact">Contact info</string>
+    <string name="contents_email">Email address</string>
+    <string name="contents_location">Geographic coordinates</string>
+    <string name="contents_phone">Phone number</string>
+    <string name="contents_sms">SMS address</string>
+    <string name="contents_text">Plain text</string>
+    <string name="collect_book">收藏</string>
+    <string name="already_collect_book">已收藏</string>
+    <string name="not_found_book">没有检索到您需要的书，请重新检索</string>
+    <string name="has_no_collect_hint">当前有未保存的书籍，确定不收藏直接退出么？</string>
+    <string name="btn_confirm">确定</string>
+    <string name="btn_cancel">取消</string>
+</resources>
