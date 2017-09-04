@@ -22,7 +22,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-
 /**
  * Created by Gzw on 2017/8/14 0014.
  */
@@ -75,6 +74,7 @@ public class ShowSearchBookAdapter extends RecyclerView.Adapter<ShowSearchBookAd
             super(itemView);
             mContext = itemView.getContext();
             ButterKnife.bind(this, itemView);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

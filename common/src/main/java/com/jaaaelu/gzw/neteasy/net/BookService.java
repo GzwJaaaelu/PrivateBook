@@ -13,11 +13,13 @@ import retrofit2.http.Query;
  * Created by admin on 2017/7/7.
  */
 
-public interface BookService {
+interface BookService {
 
     @GET("isbn/{isbnNumber}")
     Call<Book> queryBookByISBN(@Path("isbnNumber") String isbnNumber);
 
     @GET("search")
-    Call<Books> queryBookByKeyWord(@Query("q") String keyWord);
+    Call<Books> queryBookByKeyWord(@Query("q") String keyWord,
+                                   @Query("start") int start,
+                                   @Query("count") int count);
 }

@@ -1,5 +1,6 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook;
 
+import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,7 +75,10 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mActivity.queryBookByKeyWord( mHistorySearchList.get(getAdapterPosition()).getKeyWord());
+                    HistorySearchInfo historySearchInfo = mHistorySearchList.get(getAdapterPosition());
+                    historySearchInfo.setSearchTime(System.currentTimeMillis());
+                    historySearchInfo.update();
+                    mActivity.queryBookByKeyWord(historySearchInfo.getKeyWord());
                 }
             });
 

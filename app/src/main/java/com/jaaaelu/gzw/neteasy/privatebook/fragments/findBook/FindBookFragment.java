@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.jaaaelu.gzw.neteasy.common.app.BaseFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.activities.SearchBookActivity;
+import com.jaaaelu.gzw.neteasy.privatebook.activities.WebViewActivity;
 import com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity;
 
 import butterknife.BindView;
@@ -20,7 +21,7 @@ import butterknife.OnClick;
 
 
 public class FindBookFragment extends BaseFragment {
-    private static final int MY_PERMISSIONS_REQUEST_READ_CAMERA = 0;
+    public static final int MY_PERMISSIONS_REQUEST_READ_CAMERA = 0;
     @BindView(R.id.iv_scan_book)
     ImageView mScanBook;
 
@@ -52,6 +53,7 @@ public class FindBookFragment extends BaseFragment {
                 break;
             case R.id.cv_find_book_by_search:
                 SearchBookActivity.show(getActivity());
+//                WebViewActivity.show(getActivity());
                 break;
         }
     }

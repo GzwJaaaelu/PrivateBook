@@ -111,7 +111,7 @@ public class NavHelper<T> {
                         newTab.clx.getName(), null);
                 newTab.fragment = fragment;
                 //  添加到 FragmentManager
-                ft.add(mContainerLayoutId, fragment, newTab.clx.getName());
+                ft.replace(mContainerLayoutId, fragment, newTab.clx.getName());
             } else {
                 //  FragmentManager 的缓存空间中重新加载到界面中
                 ft.attach(newTab.fragment);

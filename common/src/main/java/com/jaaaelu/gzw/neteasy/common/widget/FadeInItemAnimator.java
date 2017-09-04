@@ -1,13 +1,11 @@
-package com.netease.study.ui.itemanimator;
+package com.jaaaelu.gzw.neteasy.common.widget;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 
 import java.util.ArrayList;
 import java.util.List;

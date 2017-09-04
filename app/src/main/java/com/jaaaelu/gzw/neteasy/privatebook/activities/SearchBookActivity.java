@@ -4,7 +4,6 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,14 +47,14 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     RecyclerView mSearchBookInfo;
     @BindView(R.id.iv_go_back)
     ImageView mGoBack;
-    @BindView(R.id.cv_recommend_book)
-    CardView mRecommendBook;
     @BindView(R.id.ll_look_around)
     LinearLayout mLookAround;
     @BindView(R.id.ll_search_book_root)
     LinearLayout mSearchBookRoot;
     @BindView(R.id.ll_loading_book_info)
     LinearLayout mLoadingBookInfo;
+    @BindView(R.id.btn_look_round)
+    Button mLookRoundBtn;
     private ShowSearchBookAdapter mAdapter;
     private SearchHistoryAdapter mHistoryAdapter;
 
@@ -81,17 +82,23 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String keyWord = v.getText().toString();
                     queryBookByKeyWord(keyWord);
+                    closeInput();
                     return true;
                 }
                 return false;
             }
         });
 
-        mLookAround.setVisibility(View.GONE);
         mLoadingBookInfo.setVisibility(View.GONE);
         mSearchHistory.setLayoutManager(new LinearLayoutManager(this));
         mHistoryAdapter = new SearchHistoryAdapter(this);
         mSearchHistory.setAdapter(mHistoryAdapter);
+
+    }
+
+    private void closeInput() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getWindow().peekDecorView().getWindowToken(), 0); //强制隐藏键盘
     }
 
     public void queryBookByKeyWord(String keyWord) {
@@ -117,7 +124,7 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
 
     private void realSave(String keyWord, int count) {
         new HistorySearchInfo(keyWord,
-                SystemClock.currentThreadTimeMillis(),
+                System.currentTimeMillis(),
                 count).save();
     }
 
@@ -182,5 +189,10 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     @OnClick(R.id.iv_go_back)
     public void onViewClicked() {
         finish();
+    }
+
+    @OnClick(R.id.btn_look_round)
+    public void lookRound() {
+        WebViewActivity.show(this);
     }
 }

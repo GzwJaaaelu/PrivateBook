@@ -37,4 +37,5 @@ ext {
     retrofitVersion = '2.3.0'
     zxingVersion = '3.2.1'
     dbflowVersion = "4.0.5"
+    MPChartVersion = "v3.0.2"
 }

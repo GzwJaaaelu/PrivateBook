@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,9 +15,11 @@ import com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.NavHelper;
 
+
 public class HomeActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavHelper.OnTabChangedListener<Integer> {
     private NavHelper<Integer> mNavHelper;
     private BottomNavigationView mBottomNavigation;
+    private boolean mBoolean = true;
 
     /**
      * 跳转到当前 Activity
@@ -42,6 +45,7 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     protected void initData() {
         super.initData();
+        Log.e("HomeActivity", "initData");
         mNavHelper = new NavHelper<>(this,
                 getSupportFragmentManager(),
                 R.id.fl_container,
@@ -64,10 +68,7 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         //  返回 True 切换换下面的被点击的导航
         //  将事件流转到工具类中
-//        if (item.getItemId() == R.id.navigation_scan_book) {
-//            ScanBookActivity.show(this);
-//            return true;
-//        }
+        Log.e("HomeActivity", "onNavigationItemSelected");
         return mNavHelper.performClickMenu(item.getItemId());
     }
 

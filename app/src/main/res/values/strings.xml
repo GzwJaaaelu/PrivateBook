@@ -6,7 +6,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_my_book">我的藏书</string>
     <string name="title_find_book">图书查找</string>
-    <string name="title_book_statistics">藏书总量</string>
+    <string name="title_book_statistics">藏书统计</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_toolbar">ToolbarActivity</string>
@@ -109,4 +109,5 @@
     <string name="look_around">随便看看</string>
     <string name="private_book_total_price">藏书总价</string>
     <string name="delete_book">删除</string>
+    <string name="book_analyze">藏书基因分析</string>
 </resources>

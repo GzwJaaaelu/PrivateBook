@@ -24,6 +24,7 @@ import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -168,7 +169,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         } else {
             mBookRating.setText("评价人数不足");
         }
-        mBookPrice.setText("定价: " + mCurrBook.getPrice());
+        mBookPrice.setText("定价: ¥ " + BookManager.handleMoneyUtil(mCurrBook.getPrice()));
         mBookPublisher.setText("出版社: " + mCurrBook.getPublisher());
         mBookYear.setText("出版年: " + mCurrBook.getPubdate());
         mBookPage.setText("页数: " + mCurrBook.getPages());

@@ -18,10 +18,9 @@ import butterknife.BindView;
  * Created by Gzw on 2017/8/14 0014.
  */
 
-class ShowByListHolder extends PrivaterBookHolder {
+public class ShowByListHolder extends PrivaterBookHolder {
     @BindView(R.id.tv_book_description)
     TextView mBookDescription;
-
 
     ShowByListHolder(View itemView) {
         super(itemView);

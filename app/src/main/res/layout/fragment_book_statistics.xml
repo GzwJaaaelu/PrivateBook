@@ -41,22 +41,33 @@
         layout="@layout/default_empty_view"
         android:visibility="gone"/>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/colorAccent"
-        android:minHeight="170dp"/>
-
-
-    <com.jaaaelu.gzw.neteasy.common.widget.PieChart
-        android:id="@+id/pie_chart"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@color/colorAccent"
         android:minHeight="170dp"
-        android:visibility="gone"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:gravity="center"
+            android:text="@string/book_analyze"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pie_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

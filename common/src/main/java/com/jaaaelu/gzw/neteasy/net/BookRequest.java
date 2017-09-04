@@ -16,6 +16,8 @@ import retrofit2.Response;
 public class BookRequest {
     private static volatile BookRequest sInstance;
     private BookService mBookService;
+    private static final int SEARCH_START_INDEX = 0;
+    private static final int SEARCH_TOTAL_COUN = 100;
 
     private BookRequest() {
         mBookService = Network.getBookService();
@@ -51,7 +53,7 @@ public class BookRequest {
     }
 
     public void queryBookByKeyWord(String keyWord, final OnBookResultListener<Books> listener) {
-        mBookService.queryBookByKeyWord(keyWord).enqueue(new Callback<Books>() {
+        mBookService.queryBookByKeyWord(keyWord, SEARCH_START_INDEX , SEARCH_TOTAL_COUN).enqueue(new Callback<Books>() {
             @Override
             public void onResponse(@NonNull Call<Books> call, @NonNull Response<Books> response) {
                 if (response.isSuccessful() && response.body() != null) {
