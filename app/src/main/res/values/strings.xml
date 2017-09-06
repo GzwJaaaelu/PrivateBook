@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PrivateBook</string>
+    <string name="app_name">私人藏书</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>

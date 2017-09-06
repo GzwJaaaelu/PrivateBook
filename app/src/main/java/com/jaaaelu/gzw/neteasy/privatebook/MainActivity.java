@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            HomeActivity.show(getApplicationContext());
+            HomeActivity.show(MainActivity.this);
             finish();
         }
     }
