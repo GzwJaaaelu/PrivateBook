@@ -1,36 +1,37 @@
 package com.jaaaelu.gzw.neteasy.privatebook;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
+import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.activities.HomeActivity;
 
-public class MainActivity extends AppCompatActivity {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import me.wangyuwei.particleview.ParticleView;
+
+public class MainActivity extends BaseActivity {
     private static Handler sHandler = new Handler(Looper.getMainLooper());
-    private ShowHome mShowHome;
+    @BindView(R.id.pv_particle)
+    ParticleView mParticle;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mShowHome = new ShowHome();
-        sHandler.postDelayed(mShowHome, 1800);
+    protected int getLayoutResId() {
+        return R.layout.activity_main;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        sHandler.removeCallbacks(mShowHome);
-    }
-
-    private class ShowHome implements Runnable {
-
-        @Override
-        public void run() {
-            HomeActivity.show(MainActivity.this);
-            finish();
-        }
+    protected void initView() {
+        super.initView();
+        mParticle.setOnParticleAnimListener(new ParticleView.ParticleAnimListener() {
+            @Override
+            public void onAnimationEnd() {
+                HomeActivity.show(MainActivity.this);
+                finish();
+            }
+        });
+        mParticle.startAnim();
     }
 }

@@ -1,8 +1,8 @@
 package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
@@ -11,10 +11,13 @@ import android.view.MenuItem;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
-import com.jaaaelu.gzw.neteasy.privatebook.fragments.statisticsbook.BookStatisticsFragment;
-import com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment;
+import com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment;
+import com.jaaaelu.gzw.neteasy.privatebook.fragments.statisticsbook.BookStatisticsFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.NavHelper;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 public class HomeActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavHelper.OnTabChangedListener<Integer> {

@@ -10,6 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.CycleInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -81,6 +84,11 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String keyWord = v.getText().toString();
+                    if ("".equals(keyWord)) {
+                        mBookInfoEdit.startAnimation(shakeAnimation(5));
+                        return true;
+                    }
+
                     queryBookByKeyWord(keyWord);
                     closeInput();
                     return true;
@@ -94,6 +102,19 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         mHistoryAdapter = new SearchHistoryAdapter(this);
         mSearchHistory.setAdapter(mHistoryAdapter);
 
+    }
+
+    /**
+     * 借鉴了别人的动画方法
+     *
+     * @param counts 次数
+     * @return 动画
+     */
+    private Animation shakeAnimation(int counts) {
+        Animation translateAnimation = new TranslateAnimation(0, 10, 0, 0);
+        translateAnimation.setInterpolator(new CycleInterpolator(counts));
+        translateAnimation.setDuration(1000);
+        return translateAnimation;
     }
 
     private void closeInput() {

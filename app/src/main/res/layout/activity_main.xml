@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:contentDescription="@string/app_name"
-           android:scaleType="centerCrop"
-           android:src="@drawable/ic_splash"/>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:pv="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:background="?attr/colorPrimary">
+
+    <me.wangyuwei.particleview.ParticleView
+        android:id="@+id/pv_particle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        pv:pv_background_color="?attr/colorPrimary"
+        pv:pv_host_text="私人藏书"
+        pv:pv_particle_text="1.1"
+        pv:pv_particle_text_size="16sp"
+        pv:pv_spread_anim_time="800"
+        pv:pv_text_anim_time="1600"
+        pv:pv_text_color="#FFF" />
+</LinearLayout>
