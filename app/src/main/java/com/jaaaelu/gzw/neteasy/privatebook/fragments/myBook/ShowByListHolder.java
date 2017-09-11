@@ -28,7 +28,7 @@ public class ShowByListHolder extends PrivaterBookHolder {
     @Override
     public void setBookInfo(Book book) {
         super.setBookInfo(book);
-        mBookDescription.setText("作者：" + book.getAuthorStr());
+        dealEmptyData(mBookDescription, book.getAuthorStr(), "作者: ");
         Glide.with(mContext)
                 .load(book.getImage())
                 .into(mBookImage);

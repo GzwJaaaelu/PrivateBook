@@ -49,4 +49,6 @@ dependencies {
     annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${rootProject.ext.dbflowVersion}"
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${rootProject.ext.dbflowVersion}"
     compile "com.github.Raizlabs.DBFlow:dbflow:${rootProject.ext.dbflowVersion}"
+
+    compile 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
 }

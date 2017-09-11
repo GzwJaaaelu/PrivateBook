@@ -3,6 +3,7 @@ package com.jaaaelu.gzw.neteasy.privatebook.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,21 +11,28 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.model.Book;
+import com.jaaaelu.gzw.neteasy.model.BookNote;
+import com.jaaaelu.gzw.neteasy.net.BookRequest;
+import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
+import com.jaaaelu.gzw.neteasy.privatebook.helper.WeChatSDK;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
-import java.text.DecimalFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,7 +41,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book> {
+public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book>, OnBookResultListener<BookNote> {
     public static final String BOOK_LOCAL_INFO_ARGS = "book_local_info_args";
     public static final String BOOK_SEARCH_INFO_ARGS = "book_search_info_args";
 
@@ -81,6 +89,8 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     ImageView mBookImage;
     @BindView(R.id.tv_book_rating)
     TextView mBookRating;
+    @BindView(R.id.rb_ratingBar)
+    RatingBar mRatingBar;
 
     private Book mCurrBook;
     private boolean mIsCollect;
@@ -150,30 +160,37 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         setBookInfo();
         enableBtn(true);
         changeCollectBtn();
+
+        BookRequest.getInstance().queryBookNote(mCurrBook.getId(), this);
     }
 
+
     private void setBookInfo() {
-        mBookName.setText(mCurrBook.getTitle());
-        mBookAuthor.setText("作者: " + mCurrBook.getAuthorStr());
+        dealEmptyData(mBookName, mCurrBook.getTitle(), "");
+        dealEmptyData(mBookAuthor, mCurrBook.getAuthorStr(), "作者: ");
         if ("".equals(mCurrBook.getTranslatorStr())) {
             mBookTranslator.setVisibility(View.GONE);
         } else {
-            mBookTranslator.setText("译者: " + mCurrBook.getTranslatorStr());
+            dealEmptyData(mBookTranslator, mCurrBook.getTranslatorStr(), "译者: ");
         }
         if (!"".equals(mCurrBook.getTagsStr())) {
-            mBookClassify.setText("分类: " + mCurrBook.getTagsStr().split(",")[1].split("=")[1].replace('\'', ' ').trim());
+            dealEmptyData(mBookClassify, mCurrBook.getTagsStr().split(",")[1].split("=")[1].replace('\'', ' ').trim(), "分类: ");
+        } else {
+            dealEmptyData(mBookClassify, "", "分类: ");
         }
         double average = Double.valueOf(mCurrBook.getRatingStr().split(",")[2].split("=")[1].replace('\'', ' ').trim());
         if (average != 0) {
             mBookRating.setText("豆瓣评分: " + average + " 分 / " + Integer.valueOf(mCurrBook.getRatingStr().split(",")[1].split("=")[1].replace('\'', ' ').trim()) + " 人");
+            mRatingBar.setRating((float) average);
+            mRatingBar.setStepSize(2.0f);
         } else {
             mBookRating.setText("评价人数不足");
         }
         mBookPrice.setText("定价: ¥ " + BookManager.handleMoneyUtil(mCurrBook.getPrice()));
-        mBookPublisher.setText("出版社: " + mCurrBook.getPublisher());
-        mBookYear.setText("出版年: " + mCurrBook.getPubdate());
-        mBookPage.setText("页数: " + mCurrBook.getPages());
-        mBookIsbn.setText("ISBN: " + mCurrBook.getIsbn13());
+        dealEmptyData(mBookPublisher, mCurrBook.getPublisher(), "出版社: ");
+        dealEmptyData(mBookYear,  mCurrBook.getPubdate(), "出版年: ");
+        dealEmptyData(mBookPage,  mCurrBook.getPages(), "页数: ");
+        dealEmptyData(mBookIsbn,  mCurrBook.getIsbn13(), "ISBN: ");
         mBookIntroduction.setText(mCurrBook.getSummary());
 
         String image = mCurrBook.getImage();
@@ -187,6 +204,13 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         getBitmapFormUrl(image);
     }
 
+    private void dealEmptyData(TextView view, String text, String prefix) {
+        if (TextUtils.isEmpty(text)) {
+            view.setText(prefix + "暂无数据");
+        } else {
+            view.setText(prefix + text);
+        }
+    }
 
     private void getBitmapFormUrl(final String image) {
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -290,5 +314,39 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         }
         mIsCollect = true;
         changeCollectBtn();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+
+        getMenuInflater().inflate(R.menu.menu_book_detail, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_share:
+                ((Animatable) item.getIcon()).start();
+                WeChatSDK.shardText("我觉得《" + mCurrBook.getTitle() + "》不错，分享给你~ \n" + mCurrBook.getAlt());
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onSuccess(BookNote bookNote) {
+    }
+
+    @Override
+    public void onFailure(Throwable t) {
     }
 }

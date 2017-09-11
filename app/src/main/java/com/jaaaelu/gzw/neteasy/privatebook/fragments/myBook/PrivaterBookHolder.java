@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -76,5 +77,14 @@ class PrivaterBookHolder extends RecyclerView.ViewHolder {
     public void setBookInfo(Book book) {
         mCurrBook = book;
         mBookName.setText(book.getTitle());
+    }
+
+
+    protected void dealEmptyData(TextView view, String text, String prefix) {
+        if (TextUtils.isEmpty(text)) {
+            view.setText(prefix + "暂无数据");
+        } else {
+            view.setText(prefix + text);
+        }
     }
 }

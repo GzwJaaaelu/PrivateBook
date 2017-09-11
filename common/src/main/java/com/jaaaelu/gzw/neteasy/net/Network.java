@@ -46,7 +46,7 @@ public class Network {
         return sInstance.mRetrofit;
     }
 
-    public static BookService getBookService() {
+    static BookService getBookService() {
         return getRetrofit().create(BookService.class);
     }
 }

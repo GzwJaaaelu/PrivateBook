@@ -3,6 +3,7 @@ package com.jaaaelu.gzw.neteasy.net;
 import android.support.annotation.NonNull;
 
 import com.jaaaelu.gzw.neteasy.model.Book;
+import com.jaaaelu.gzw.neteasy.model.BookNote;
 import com.jaaaelu.gzw.neteasy.model.Books;
 
 import retrofit2.Call;
@@ -17,7 +18,7 @@ public class BookRequest {
     private static volatile BookRequest sInstance;
     private BookService mBookService;
     private static final int SEARCH_START_INDEX = 0;
-    private static final int SEARCH_TOTAL_COUN = 100;
+    private static final int SEARCH_TOTAL_COUNT = 100;
 
     private BookRequest() {
         mBookService = Network.getBookService();
@@ -53,7 +54,7 @@ public class BookRequest {
     }
 
     public void queryBookByKeyWord(String keyWord, final OnBookResultListener<Books> listener) {
-        mBookService.queryBookByKeyWord(keyWord, SEARCH_START_INDEX , SEARCH_TOTAL_COUN).enqueue(new Callback<Books>() {
+        mBookService.queryBookByKeyWord(keyWord, SEARCH_START_INDEX , SEARCH_TOTAL_COUNT).enqueue(new Callback<Books>() {
             @Override
             public void onResponse(@NonNull Call<Books> call, @NonNull Response<Books> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -65,6 +66,24 @@ public class BookRequest {
 
             @Override
             public void onFailure(@NonNull Call<Books> call, @NonNull Throwable t) {
+                listener.onFailure(t);
+            }
+        });
+    }
+
+    public void queryBookNote(String bookId, final OnBookResultListener<BookNote> listener) {
+        mBookService.queryBookNote(bookId).enqueue(new Callback<BookNote>() {
+            @Override
+            public void onResponse(@NonNull Call<BookNote> call, @NonNull Response<BookNote> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    listener.onSuccess(response.body());
+                } else {
+                    listener.onFailure(null);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<BookNote> call, @NonNull Throwable t) {
                 listener.onFailure(t);
             }
         });

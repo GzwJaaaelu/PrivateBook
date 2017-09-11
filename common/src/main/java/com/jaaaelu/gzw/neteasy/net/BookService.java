@@ -1,6 +1,7 @@
 package com.jaaaelu.gzw.neteasy.net;
 
 import com.jaaaelu.gzw.neteasy.model.Book;
+import com.jaaaelu.gzw.neteasy.model.BookNote;
 import com.jaaaelu.gzw.neteasy.model.Books;
 
 import retrofit2.Call;
@@ -22,4 +23,7 @@ interface BookService {
     Call<Books> queryBookByKeyWord(@Query("q") String keyWord,
                                    @Query("start") int start,
                                    @Query("count") int count);
+
+    @GET("{bookId}/reviews")
+    Call<BookNote> queryBookNote(@Path("bookId") String bookId);
 }

@@ -13,4 +13,5 @@
     <string name="has_no_collect_hint">当前有未保存的书籍，确定不收藏直接退出么？</string>
     <string name="btn_confirm">确定</string>
     <string name="btn_cancel">取消</string>
+
 </resources>

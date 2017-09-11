@@ -26,7 +26,7 @@ class ShowByGridHolder extends PrivaterBookHolder {
     @Override
     public void setBookInfo(Book book) {
         super.setBookInfo(book);
-        mBookDescription.setText(book.getPublisher());
+        dealEmptyData(mBookDescription, book.getPublisher(), "");
         String image = book.getImage();
         if (book.getImagesStr().contains("large")) {
             image = book.getImagesStr().split(",")[1].split("=")[1].replace('\'', ' ').trim();

@@ -1,6 +1,7 @@
 package com.jaaaelu.gzw.neteasy.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.Book_Table;
@@ -67,6 +68,7 @@ public class BookManager {
 
     public static double handleMoneyUtil(String price) {
         double rmbPrice = 0.0;
+        Log.e("handleMoneyUtil", price);
         if (TextUtils.isEmpty(price)) {
             return rmbPrice;
         }
@@ -75,7 +77,7 @@ public class BookManager {
         } else if (price.contains("CNY")) {
             rmbPrice = Double.valueOf(price.split("Y")[1].trim());
         } else if (price.contains("NT$")) {
-            rmbPrice = Double.valueOf(price.replace('$', ' ').split(" ")[1]) * 0.2202;
+            rmbPrice = Double.valueOf(price.replace('$', ' ').split(" ")[price.replace('$', ' ').split(" ").length - 1]) * 0.2202;
         } else if (price.contains("USD")) {
             rmbPrice = Double.valueOf(price.split(" ")[1]) * 6.6379;
         } else if (price.contains("円")) {

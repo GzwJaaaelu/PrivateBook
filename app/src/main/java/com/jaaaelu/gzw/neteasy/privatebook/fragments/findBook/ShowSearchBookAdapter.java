@@ -3,6 +3,7 @@ package com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,10 +92,18 @@ public class ShowSearchBookAdapter extends RecyclerView.Adapter<ShowSearchBookAd
         void setBookInfo(Book book) {
             mCurrBook = book;
             mBookName.setText(book.getTitle());
-            mBookDescription.setText("作者：" + book.getAuthorStr());
+            dealEmptyData(mBookDescription, book.getAuthorStr(), "作者: ");
             Glide.with(mContext)
                     .load(book.getImage())
                     .into(mBookImage);
+        }
+
+        private void dealEmptyData(TextView view, String text, String prefix) {
+            if (TextUtils.isEmpty(text)) {
+                view.setText(prefix + "暂无数据");
+            } else {
+                view.setText(prefix + text);
+            }
         }
     }
 }

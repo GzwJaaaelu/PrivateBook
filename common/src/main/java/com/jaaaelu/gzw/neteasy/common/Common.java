@@ -15,5 +15,7 @@ public class Common {
         String REGEX_PHONE = "[1][3,4,5,7,8][0-9]{9}";
         //  基础网络请求地址
         String API_URL = "https://api.douban.com/v2/book/";
+
+        String WE_CHAT_APP_ID = "";
     }
 }
