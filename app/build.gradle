@@ -41,6 +41,5 @@ dependencies {
     compile "com.github.PhilJay:MPAndroidChart:$rootProject.ext.MPChartVersion"
 
     compile "me.wangyuwei:ParticleView:$rootProject.ext.particleVersion"
-
-    compile 'com.github.jetradarmobile.desertplaceholder:desertplaceholder:1.2.4'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

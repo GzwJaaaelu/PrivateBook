@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <!-- 开启闪光灯权限 -->
     <uses-permission android:name="android.permission.FLASHLIGHT"/>
-
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
@@ -29,6 +28,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -36,25 +36,37 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.HomeActivity"
             android:label="@string/title_activity_home">
         </activity>
+
         <activity android:name=".activities.ScanBookActivity">
         </activity>
+
         <activity android:name="com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity"/>
+
         <activity
             android:name=".activities.BookDetailActivity"
             android:label="@string/book_detail"
             android:theme="@style/AppTheme">
         </activity>
+
         <activity
             android:name=".activities.SearchBookActivity"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".activities.WebViewActivity"
+
+        <activity
+            android:name=".activities.WebViewActivity"
             android:process=":webView">
         </activity>
+
+        <activity android:name=".activities.EverNoteActivity"
+            android:label="印象笔记">
+        </activity>
+
     </application>
 
 </manifest>

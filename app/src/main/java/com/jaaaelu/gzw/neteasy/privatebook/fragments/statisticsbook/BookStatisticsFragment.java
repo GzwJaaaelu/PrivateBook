@@ -199,7 +199,7 @@ public class BookStatisticsFragment extends BaseFragment {
             entries.add(new PieEntry(mCountMap.get(key), key));
         }
         PieDataSet dataSet = new PieDataSet(entries, "");
-        ArrayList<Integer> colors = new ArrayList<Integer>();
+        ArrayList<Integer> colors = new ArrayList<>();
 
         for (int c : ColorTemplate.VORDIPLOM_COLORS)
             colors.add(c);

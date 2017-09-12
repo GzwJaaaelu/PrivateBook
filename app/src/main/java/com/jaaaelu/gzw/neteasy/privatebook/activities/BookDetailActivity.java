@@ -20,8 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.evernote.client.android.EvernoteSession;
+import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.BookNote;
@@ -41,7 +44,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book>, OnBookResultListener<BookNote> {
+public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book>,
+        OnBookResultListener<BookNote>, EvernoteLoginFragment.ResultCallback {
     public static final String BOOK_LOCAL_INFO_ARGS = "book_local_info_args";
     public static final String BOOK_SEARCH_INFO_ARGS = "book_search_info_args";
 
@@ -191,7 +195,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         dealEmptyData(mBookYear,  mCurrBook.getPubdate(), "出版年: ");
         dealEmptyData(mBookPage,  mCurrBook.getPages(), "页数: ");
         dealEmptyData(mBookIsbn,  mCurrBook.getIsbn13(), "ISBN: ");
-        mBookIntroduction.setText(mCurrBook.getSummary());
+        dealEmptyData(mBookIntroduction, mCurrBook.getSummary(), "");
 
         String image = mCurrBook.getImage();
         if (mCurrBook.getImagesStr().contains("large")) {
@@ -332,6 +336,13 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                 ((Animatable) item.getIcon()).start();
                 WeChatSDK.shardText("我觉得《" + mCurrBook.getTitle() + "》不错，分享给你~ \n" + mCurrBook.getAlt());
                 return true;
+            case R.id.action_ever_note:
+                if (EvernoteSession.getInstance().isLoggedIn()) {
+                    EverNoteActivity.show(this);
+                } else {
+                    EvernoteSession.getInstance().authenticate(this);
+                }
+
             default:
                 return false;
         }
@@ -344,9 +355,20 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
 
     @Override
     public void onSuccess(BookNote bookNote) {
+
     }
 
     @Override
     public void onFailure(Throwable t) {
+
+    }
+
+    @Override
+    public void onLoginFinished(boolean successful) {
+        if (successful) {
+            EverNoteActivity.show(this);
+        } else {
+            Toast.makeText(this, "授权失败", Toast.LENGTH_SHORT).show();
+        }
     }
 }

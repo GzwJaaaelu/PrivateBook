@@ -17,8 +17,10 @@ import retrofit2.Response;
 public class BookRequest {
     private static volatile BookRequest sInstance;
     private BookService mBookService;
-    private static final int SEARCH_START_INDEX = 0;
-    private static final int SEARCH_TOTAL_COUNT = 100;
+    public static final int SEARCH_START_INDEX = 0;
+    public static final int SEARCH_TOTAL_COUNT = 100;
+    //  豆瓣最多也就支持 0 - 2000 的 开始下标
+    public static final int SEARCH_MAX_START_INDEX = 2000;
 
     private BookRequest() {
         mBookService = Network.getBookService();
@@ -53,8 +55,8 @@ public class BookRequest {
         });
     }
 
-    public void queryBookByKeyWord(String keyWord, final OnBookResultListener<Books> listener) {
-        mBookService.queryBookByKeyWord(keyWord, SEARCH_START_INDEX , SEARCH_TOTAL_COUNT).enqueue(new Callback<Books>() {
+    public void queryBookByKeyWord(String keyWord, int startIndex, final OnBookResultListener<Books> listener) {
+        mBookService.queryBookByKeyWord(keyWord, startIndex , SEARCH_TOTAL_COUNT).enqueue(new Callback<Books>() {
             @Override
             public void onResponse(@NonNull Call<Books> call, @NonNull Response<Books> response) {
                 if (response.isSuccessful() && response.body() != null) {

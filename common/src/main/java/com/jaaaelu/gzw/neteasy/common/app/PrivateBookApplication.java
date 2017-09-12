@@ -6,6 +6,12 @@ import android.os.Looper;
 import android.support.annotation.StringRes;
 import android.widget.Toast;
 
+import com.evernote.client.android.EvernoteSession;
+import com.jaaaelu.gzw.neteasy.common.Common;
+
+import static com.jaaaelu.gzw.neteasy.common.Common.Constance.CONSUMER_KEY;
+import static com.jaaaelu.gzw.neteasy.common.Common.Constance.CONSUMER_SECRET;
+
 /**
  * Created by Gzw on 2017/8/12 0012.
  */
@@ -16,6 +22,7 @@ public class PrivateBookApplication extends Application {
     }
     private static Application sInstance;
     private static Handler sHandler = new Handler(Looper.getMainLooper());
+
 
     @Override
     public void onCreate() {

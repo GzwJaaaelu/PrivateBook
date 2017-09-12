@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.evernote.client.android.EvernoteSession;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment;
@@ -78,6 +79,5 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onTabChanged(NavHelper.Tab<Integer> oldTab, NavHelper.Tab<Integer> newTab) {
-
     }
 }

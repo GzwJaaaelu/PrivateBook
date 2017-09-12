@@ -6,4 +6,10 @@
         android:icon="@drawable/ic_action_share"
         android:title="@string/action_share"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_ever_note"
+        android:icon="@drawable/ic_action_share"
+        android:title="@string/add_to_ever_note"
+        app:showAsAction="never" />
 </menu>

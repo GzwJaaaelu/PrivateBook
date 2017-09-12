@@ -2,23 +2,19 @@ package com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook;
 
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseFragment;
-import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty;
+import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmptyAndLoadData;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
@@ -29,28 +25,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 import static com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment.MY_PERMISSIONS_REQUEST_READ_CAMERA;
 import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBookAdapter.ViewType.SHOW_BY_GRID;
 import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBookAdapter.ViewType.SHOW_BY_LIST;
 
 
-public class MyBookFragment extends BaseFragment {
+public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.rv_show_my_book)
-    RecycleViewWithEmpty mShowMyBook;
+    RecycleViewWithEmptyAndLoadData mShowMyBook;
     @BindView(R.id.iv_recyclerView_style)
     ImageView mRecyclerViewStyle;
     @BindView(R.id.iv_go_add_book)
     ImageView mIvGoAddBook;
+    @BindView(R.id.srl_refresh_layout)
+    SwipeRefreshLayout mRefreshLayout;
     private boolean mShowList = true;
     private List<Book> mBooks;
     private ShowPrivateBookAdapter mAdapter;
-    ListView mListView;
 
     public MyBookFragment() {
         // Required empty public constructor
@@ -61,6 +56,10 @@ public class MyBookFragment extends BaseFragment {
     @Override
     protected void initView(View view) {
         super.initView(view);
+
+        mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
+        mRefreshLayout.setOnRefreshListener(this);
+
         mShowMyBook.setLayoutManager(new LinearLayoutManager(getActivity()));
         mShowMyBook.setEmptyView(view.findViewById(R.id.cl_empty_view));
         mShowMyBook.setAdapter(mAdapter);
@@ -86,6 +85,7 @@ public class MyBookFragment extends BaseFragment {
                 mBooks.clear();
                 mBooks.addAll(tResult);
                 mAdapter.notifyDataSetChanged();
+                mRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -154,5 +154,11 @@ public class MyBookFragment extends BaseFragment {
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        queryBook();
+        mRefreshLayout.setRefreshing(true);
     }
 }

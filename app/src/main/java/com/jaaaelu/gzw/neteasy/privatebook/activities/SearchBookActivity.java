@@ -3,13 +3,10 @@ package com.jaaaelu.gzw.neteasy.privatebook.activities;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -21,9 +18,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
+import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmptyAndLoadData;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.Books;
 import com.jaaaelu.gzw.neteasy.model.HistorySearchInfo;
@@ -39,17 +38,16 @@ import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransacti
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SearchBookActivity extends BaseActivity implements OnBookResultListener<Books> {
+public class SearchBookActivity extends BaseActivity implements OnBookResultListener<Books>, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.et_book_info_edit)
     EditText mBookInfoEdit;
     @BindView(R.id.rl_search_history)
     RecyclerView mSearchHistory;
     @BindView(R.id.rl_search_book_info)
-    RecyclerView mSearchBookInfo;
+    RecycleViewWithEmptyAndLoadData mSearchBookInfo;
     @BindView(R.id.iv_go_back)
     ImageView mGoBack;
     @BindView(R.id.ll_look_around)
@@ -60,8 +58,17 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     LinearLayout mLoadingBookInfo;
     @BindView(R.id.btn_look_round)
     Button mLookRoundBtn;
+    @BindView(R.id.srl_refresh_layout)
+    SwipeRefreshLayout mRefreshLayout;
+    @BindView(R.id.pb_loading_more)
+    ProgressBar mLoadingMore;
+    @BindView(R.id.ll_end_hint)
+    LinearLayout mEndHint;
     private ShowSearchBookAdapter mAdapter;
     private SearchHistoryAdapter mHistoryAdapter;
+    private int mCurrStartIndex = BookRequest.SEARCH_START_INDEX;
+    private boolean mHasQueryNext = true;
+    private String mCurrKeyword = "";
 
     /**
      * 跳转到当前 Activity
@@ -80,18 +87,21 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     @Override
     protected void initView() {
         super.initView();
+
+        mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
+        mRefreshLayout.setOnRefreshListener(this);
+
         mSearchBookRoot.setLayoutTransition(getLayoutTransition());
         mBookInfoEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String keyWord = v.getText().toString();
-                    if ("".equals(keyWord)) {
+                    String keyword = v.getText().toString();
+                    if ("".equals(keyword)) {
                         mBookInfoEdit.startAnimation(shakeAnimation(5));
                         return true;
                     }
-
-                    queryBookByKeyWord(keyWord);
+                    queryBookByKeyWord(keyword);
                     closeInput();
                     return true;
                 }
@@ -103,7 +113,6 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         mSearchHistory.setLayoutManager(new LinearLayoutManager(this));
         mHistoryAdapter = new SearchHistoryAdapter(this);
         mSearchHistory.setAdapter(mHistoryAdapter);
-
     }
 
     /**
@@ -125,8 +134,11 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     }
 
     public void queryBookByKeyWord(String keyWord) {
-        mLoadingBookInfo.setVisibility(View.VISIBLE);
-        BookRequest.getInstance().queryBookByKeyWord(keyWord, SearchBookActivity.this);
+        mCurrKeyword = keyWord;
+        if (!mRefreshLayout.isRefreshing()) {
+            mLoadingBookInfo.setVisibility(View.VISIBLE);
+        }
+        BookRequest.getInstance().queryBookByKeyWord(keyWord, mCurrStartIndex, SearchBookActivity.this);
         saveHistoryInfo(keyWord);
     }
 
@@ -190,11 +202,23 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
             changeVisibility(true);
             return;
         }
-        mAdapter.setBooks(books.getBooks());
+        if (mCurrStartIndex == BookRequest.SEARCH_START_INDEX) {
+            mAdapter.setBooks(books.getBooks());
+        } else {
+            mAdapter.setBooksAndNotClear(books.getBooks());
+        }
         changeVisibility(true);
+
+        mCurrStartIndex += BookRequest.SEARCH_TOTAL_COUNT;
+
+        if ((books.getCount() + books.getStart()) >= books.getTotal()
+                || mCurrStartIndex > BookRequest.SEARCH_MAX_START_INDEX) {
+            mHasQueryNext = false;
+        }
     }
 
     private void changeVisibility(boolean showBookInfoList) {
+        mRefreshLayout.setRefreshing(false);
 //        mLookAround.setVisibility(showBookInfoList ? View.GONE : View.VISIBLE);
         mLoadingBookInfo.setVisibility(View.GONE);
         mSearchHistory.setVisibility(showBookInfoList ? View.GONE : View.VISIBLE);
@@ -218,4 +242,13 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     public void lookRound() {
         WebViewActivity.show(this);
     }
+
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        mHasQueryNext = true;
+        mCurrStartIndex = BookRequest.SEARCH_START_INDEX;
+        queryBookByKeyWord(mCurrKeyword);
+    }
+
 }

@@ -43,6 +43,11 @@ public class ShowSearchBookAdapter extends RecyclerView.Adapter<ShowSearchBookAd
         notifyDataSetChanged();
     }
 
+    public void setBooksAndNotClear(List<Book> books) {
+        mBooks.addAll(books);
+        notifyDataSetChanged();
+    }
+
     @Override
     public ShowByListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_book, parent, false);

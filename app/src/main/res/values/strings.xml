@@ -148,6 +148,11 @@
     818.708718,521.238484 819.793846,539.955453 C823.549333,604.698526 772.458667,660.344842
     707.700103,664.112758 C692.470564,664.706947 684.119795,673.341558 684.063179,687.984084 Z
   </string>
+    <string name="list_end_hint">我也是有底线的</string>
+    <string name="add_to_ever_note">添加至印象笔记</string>
+    <string name="note_hint">☆ 本应用中只能添加笔记和查看笔记，暂不支持更新…</string>
+    <string name="note_title">笔记标题</string>
+    <string name="note_content">笔记内容</string>
     <integer name="wallapop_original_width">1024</integer>
     <integer name="wallapop_original_height">1024</integer>
 </resources>
