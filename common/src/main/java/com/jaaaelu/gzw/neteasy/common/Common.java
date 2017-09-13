@@ -16,9 +16,9 @@ public class Common {
         //  基础网络请求地址
         String API_URL = "https://api.douban.com/v2/book/";
 
-        String CONSUMER_KEY = "jaaaelu";
-        String CONSUMER_SECRET = "512b5e7ff8209d74";
+        String CONSUMER_KEY = "";
+        String CONSUMER_SECRET = "";
 
-        String WE_CHAT_APP_ID = "wx481ec8201cc68e3d";
+        String WE_CHAT_APP_ID = "";
     }
 }
