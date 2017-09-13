@@ -13,9 +13,8 @@ import android.view.View;
  * Created by Gzw on 2017/8/15 0015.
  */
 
-public class RecycleViewWithEmptyAndLoadData extends RecyclerView {
+public class RecycleViewWithEmpty extends RecyclerView {
     private View mEmptyView;
-    private OnLoadDataListener mLoadDataListener;
 
     final private AdapterDataObserver mObserver = new AdapterDataObserver() {
         @Override
@@ -29,37 +28,20 @@ public class RecycleViewWithEmptyAndLoadData extends RecyclerView {
         }
     };
 
-    public RecycleViewWithEmptyAndLoadData(Context context) {
+    public RecycleViewWithEmpty(Context context) {
         super(context);
-        init();
+
     }
 
-    public RecycleViewWithEmptyAndLoadData(Context context, AttributeSet attrs) {
+    public RecycleViewWithEmpty(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+
     }
 
-    public RecycleViewWithEmptyAndLoadData(Context context, AttributeSet attrs,
-                                           int defStyle) {
+    public RecycleViewWithEmpty(Context context, AttributeSet attrs,
+                                int defStyle) {
         super(context, attrs, defStyle);
-        init();
-    }
 
-    private void init() {
-        addOnScrollListener(new OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                //  判断是否到底了
-                if (recyclerView.getChildCount()
-                        + ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition()
-                        >= recyclerView.getLayoutManager().getItemCount())   {
-                    if (mLoadDataListener != null) {
-                        mLoadDataListener.onLoadData();
-                    }
-                }
-            }
-        });
     }
 
     void checkIfEmpty() {
@@ -88,13 +70,5 @@ public class RecycleViewWithEmptyAndLoadData extends RecyclerView {
     public void setEmptyView(View emptyView) {
         this.mEmptyView = emptyView;
         checkIfEmpty();
-    }
-
-    public void setLoadDataListener(OnLoadDataListener loadDataListener) {
-        mLoadDataListener = loadDataListener;
-    }
-
-    public interface OnLoadDataListener {
-        void onLoadData();
     }
 }

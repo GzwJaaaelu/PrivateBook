@@ -56,7 +56,7 @@ public class BookRequest {
     }
 
     public void queryBookByKeyWord(String keyWord, int startIndex, final OnBookResultListener<Books> listener) {
-        mBookService.queryBookByKeyWord(keyWord, startIndex , SEARCH_TOTAL_COUNT).enqueue(new Callback<Books>() {
+        mBookService.queryBookByKeyWord(keyWord, startIndex, SEARCH_TOTAL_COUNT).enqueue(new Callback<Books>() {
             @Override
             public void onResponse(@NonNull Call<Books> call, @NonNull Response<Books> response) {
                 if (response.isSuccessful() && response.body() != null) {

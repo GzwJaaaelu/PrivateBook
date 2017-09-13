@@ -11,10 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseFragment;
-import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmptyAndLoadData;
+import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
@@ -27,7 +26,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import static com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment.MY_PERMISSIONS_REQUEST_READ_CAMERA;
 import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBookAdapter.ViewType.SHOW_BY_GRID;
 import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBookAdapter.ViewType.SHOW_BY_LIST;
 
@@ -36,7 +34,7 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.rv_show_my_book)
-    RecycleViewWithEmptyAndLoadData mShowMyBook;
+    RecycleViewWithEmpty mShowMyBook;
     @BindView(R.id.iv_recyclerView_style)
     ImageView mRecyclerViewStyle;
     @BindView(R.id.iv_go_add_book)
@@ -93,6 +91,7 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
     @Override
     public void onResume() {
         super.onResume();
+        //  如果图书更新了就重新查询
         if (BookManager.DataChange) {
             queryBook();
             BookManager.DataChange = false;
@@ -111,6 +110,9 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
         changeRecycleView();
     }
 
+    /**
+     * 切换 RecycleView 显示方式
+     */
     private void changeRecycleView() {
         if (mAdapter.getCurrViewType() == SHOW_BY_LIST) {
             mAdapter.setCurrViewType(SHOW_BY_GRID);
@@ -125,34 +127,12 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
 
     @OnClick(R.id.iv_go_add_book)
     public void onAddBook() {
+        //  进行权限校验后跳转至二维码界面
         if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)) {
             CaptureActivity.show(getActivity());
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_READ_CAMERA);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_CAMERA: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    CaptureActivity.show(getActivity());
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(getActivity(), "您拒绝了二维码扫描的必要权限，无法使用扫码查书的功能，您可以尝试使用关键字查书功能...", Toast.LENGTH_LONG).show();
-                }
-
-            }
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 

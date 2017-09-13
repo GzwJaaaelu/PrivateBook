@@ -1,9 +1,9 @@
 package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
-import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -31,6 +31,7 @@ import java.io.IOException;
 import butterknife.BindView;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.getLayoutTransition;
 
 public class WebViewActivity extends BaseActivity {
     private static final String KEY_NOTE = "KEY_NOTE";
@@ -42,6 +43,8 @@ public class WebViewActivity extends BaseActivity {
     ProgressBar mLoading;
     @BindView(R.id.ll_web_view_root)
     LinearLayout mWebViewRoot;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
     private NoteRef mNoteRef;
     private String mHtml;
     private EvernoteHtmlHelper mEvernoteHtmlHelper;
@@ -78,41 +81,7 @@ public class WebViewActivity extends BaseActivity {
         mWebViewRoot.setLayoutTransition(getLayoutTransition());
         mLoading.setProgress(0);
         setWebViewSetting();
-
-        mShowWeb.setWebViewClient(new WebViewClient() {
-
-            @SuppressWarnings("deprecation")
-            @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                try {
-                    Response response = getEvernoteHtmlHelper().fetchEvernoteUrl(url);
-                    WebResourceResponse webResourceResponse = toWebResource(response);
-                    if (webResourceResponse != null) {
-                        return webResourceResponse;
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                return super.shouldInterceptRequest(view, url);
-            }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                if (mHtml == null) {
-                    mLoading.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                mLoading.setVisibility(View.GONE);
-            }
-        });
-
+        mShowWeb.setWebViewClient(new MyWebViewClient());
         mShowWeb.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -130,12 +99,17 @@ public class WebViewActivity extends BaseActivity {
         mNoteRef = getIntent().getParcelableExtra(KEY_NOTE);
         mHtml = getIntent().getStringExtra(KEY_HTML);
 
+        //  两种情况 一跳转到笔记详情 二跳转到豆瓣推荐
         if (mHtml != null) {
+            mToolbar.setTitle(mNoteRef.getTitle());
             String data = getHtmlData(mHtml);
             mShowWeb.loadDataWithBaseURL("", data, "text/html", "UTF-8", null);
         } else {
+            mToolbar.setTitle("豆瓣读书评分9分以上榜单");
             mShowWeb.loadUrl("https://www.douban.com/doulist/1264675/");
         }
+
+        initToolbar(mToolbar);
     }
 
     /**
@@ -152,6 +126,9 @@ public class WebViewActivity extends BaseActivity {
         return "<html>" + head + "<body style:'height:auto;max-width: 100%; width:auto;'>" + bodyHTML + "</body></html>";
     }
 
+    /**
+     * WebView 的各种设置
+     */
     private void setWebViewSetting() {
         WebSettings settings = mShowWeb.getSettings();
         settings.setLoadsImagesAutomatically(true);
@@ -161,16 +138,6 @@ public class WebViewActivity extends BaseActivity {
         settings.setBuiltInZoomControls(true);
         settings.setDisplayZoomControls(false);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-    }
-
-    private LayoutTransition getLayoutTransition() {
-        LayoutTransition layoutTransition = new LayoutTransition();
-        layoutTransition.setAnimator(LayoutTransition.APPEARING, layoutTransition.getAnimator(LayoutTransition.APPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGE_APPEARING, layoutTransition.getAnimator(LayoutTransition.CHANGE_APPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, layoutTransition.getAnimator(LayoutTransition.CHANGE_DISAPPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGING, layoutTransition.getAnimator(LayoutTransition.CHANGING));
-        layoutTransition.setAnimator(LayoutTransition.DISAPPEARING, layoutTransition.getAnimator(LayoutTransition.DISAPPEARING));
-        return layoutTransition;
     }
 
     @Override
@@ -212,5 +179,39 @@ public class WebViewActivity extends BaseActivity {
         mShowWeb.clearHistory();
         mShowWeb.clearCache(true);
         mShowWeb.destroy();
+    }
+
+    private class MyWebViewClient extends WebViewClient {
+
+        @SuppressWarnings("deprecation")
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            try {
+                Response response = getEvernoteHtmlHelper().fetchEvernoteUrl(url);
+                WebResourceResponse webResourceResponse = toWebResource(response);
+                if (webResourceResponse != null) {
+                    return webResourceResponse;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return super.shouldInterceptRequest(view, url);
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            if (mHtml == null) {
+                mLoading.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            mLoading.setVisibility(View.GONE);
+        }
     }
 }

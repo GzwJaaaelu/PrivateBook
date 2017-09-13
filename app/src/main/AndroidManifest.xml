@@ -42,9 +42,6 @@
             android:label="@string/title_activity_home">
         </activity>
 
-        <activity android:name=".activities.ScanBookActivity">
-        </activity>
-
         <activity android:name="com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity"/>
 
         <activity

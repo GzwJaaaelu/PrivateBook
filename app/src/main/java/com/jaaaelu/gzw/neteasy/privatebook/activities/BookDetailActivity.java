@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +29,8 @@ import com.jaaaelu.gzw.neteasy.model.BookNote;
 import com.jaaaelu.gzw.neteasy.net.BookRequest;
 import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
-import com.jaaaelu.gzw.neteasy.privatebook.helper.WeChatSDK;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
+import com.jaaaelu.gzw.neteasy.util.WeChatSDK;
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
@@ -41,8 +39,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.dealEmptyData;
+
 
 public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book>,
         OnBookResultListener<BookNote>, EvernoteLoginFragment.ResultCallback {
@@ -103,11 +103,23 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     /**
      * 跳转到当前 Activity
      *
-     * @param context
+     * @param context 上下文
      */
     public static void show(Context context) {
         context.startActivity(new Intent(context, BookDetailActivity.class));
     }
+
+    /**
+     * 跳转到当前 Activity
+     *
+     * @param context 上下文
+     */
+    public static void show(Context context, String bookFrom, Book book) {
+        Intent intent = new Intent(context, BookDetailActivity.class);
+        intent.putExtra(bookFrom, book);
+        context.startActivity(intent);
+    }
+
 
     @Override
     protected int getLayoutResId() {
@@ -117,40 +129,36 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     @Override
     protected void initView() {
         super.initView();
-        initToolbar();
+        initToolbar(mToolbar);
         enableBtn(false);
     }
 
+    /**
+     * 是否开启以下空间可用
+     *
+     * @param isEnable 是否可用
+     */
     private void enableBtn(boolean isEnable) {
         mCollectBook.setEnabled(isEnable);
         mFab.setEnabled(isEnable);
     }
 
-    private void initToolbar() {
-        setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-    }
-
     @Override
     protected void initData() {
         super.initData();
+        //  获取图书数据
+        //  先从搜索的查看
         mCurrBook = getIntent().getParcelableExtra(BOOK_SEARCH_INFO_ARGS);
         if (mCurrBook != null) {
             bookFormLocal(false);
+            //  从搜索点进来的图书详情，再去看看本地是否也有，因为需要更新是否收藏的按钮
             BookManager.queryBookById(this, mCurrBook.getId());
             return;
         }
+        //  再从本地查看
         mCurrBook = getIntent().getParcelableExtra(BOOK_LOCAL_INFO_ARGS);
         if (mCurrBook == null) {
+            //  都没有获取失败
             mLoading.setVisibility(View.GONE);
             mLoadingInfo.setText("获取图书信息失败...");
         } else {
@@ -158,30 +166,42 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         }
     }
 
+    /**
+     * 加载图书数据和页面
+     *
+     * @param isFormLocal 是否来自本地
+     */
     private void bookFormLocal(boolean isFormLocal) {
         mLoadingBookInfo.setVisibility(View.GONE);
+        //  本地的就都是凑上的
         mIsCollect = isFormLocal;
         setBookInfo();
         enableBtn(true);
         changeCollectBtn();
 
+        //  去查找是否有图书的笔记
         BookRequest.getInstance().queryBookNote(mCurrBook.getId(), this);
     }
 
-
+    /**
+     * 填充图书信息
+     */
     private void setBookInfo() {
         dealEmptyData(mBookName, mCurrBook.getTitle(), "");
         dealEmptyData(mBookAuthor, mCurrBook.getAuthorStr(), "作者: ");
+        //  是否有译者
         if ("".equals(mCurrBook.getTranslatorStr())) {
             mBookTranslator.setVisibility(View.GONE);
         } else {
             dealEmptyData(mBookTranslator, mCurrBook.getTranslatorStr(), "译者: ");
         }
+        //  是否有分类
         if (!"".equals(mCurrBook.getTagsStr())) {
             dealEmptyData(mBookClassify, mCurrBook.getTagsStr().split(",")[1].split("=")[1].replace('\'', ' ').trim(), "分类: ");
         } else {
             dealEmptyData(mBookClassify, "", "分类: ");
         }
+        //  豆瓣评分
         double average = Double.valueOf(mCurrBook.getRatingStr().split(",")[2].split("=")[1].replace('\'', ' ').trim());
         if (average != 0) {
             mBookRating.setText("豆瓣评分: " + average + " 分 / " + Integer.valueOf(mCurrBook.getRatingStr().split(",")[1].split("=")[1].replace('\'', ' ').trim()) + " 人");
@@ -192,12 +212,13 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         }
         mBookPrice.setText("定价: ¥ " + BookManager.handleMoneyUtil(mCurrBook.getPrice()));
         dealEmptyData(mBookPublisher, mCurrBook.getPublisher(), "出版社: ");
-        dealEmptyData(mBookYear,  mCurrBook.getPubdate(), "出版年: ");
-        dealEmptyData(mBookPage,  mCurrBook.getPages(), "页数: ");
-        dealEmptyData(mBookIsbn,  mCurrBook.getIsbn13(), "ISBN: ");
+        dealEmptyData(mBookYear, mCurrBook.getPubdate(), "出版年: ");
+        dealEmptyData(mBookPage, mCurrBook.getPages(), "页数: ");
+        dealEmptyData(mBookIsbn, mCurrBook.getIsbn13(), "ISBN: ");
         dealEmptyData(mBookIntroduction, mCurrBook.getSummary(), "");
 
         String image = mCurrBook.getImage();
+        //  获取图片的大图
         if (mCurrBook.getImagesStr().contains("large")) {
             image = mCurrBook.getImagesStr().split(",")[1].split("=")[1].replace('\'', ' ').trim();
         }
@@ -205,17 +226,14 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                 .load(image)
                 .into(mBookImage);
 
+        //  获取图书图片的 Bitmap
         getBitmapFormUrl(image);
     }
 
-    private void dealEmptyData(TextView view, String text, String prefix) {
-        if (TextUtils.isEmpty(text)) {
-            view.setText(prefix + "暂无数据");
-        } else {
-            view.setText(prefix + text);
-        }
-    }
-
+    /**
+     * Url 转为 Bitmap
+     * @param image 图片地址
+     */
     private void getBitmapFormUrl(final String image) {
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
@@ -240,6 +258,9 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         });
     }
 
+    /**
+     * 对 Bitmap 进行取色
+     */
     private void measureBitmapColor() {
         Palette.Builder builder = Palette.from(mBitmap);
         builder.generate(new Palette.PaletteAsyncListener() {
@@ -253,6 +274,11 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         });
     }
 
+    /**
+     * 修改 Toolbar 颜色
+     *
+     * @param swatch 对应颜色值
+     */
     private void changeThemeColor(Palette.Swatch swatch) {
         mToolbar.setBackgroundColor(swatch.getRgb());
         getWindow().setStatusBarColor((swatch.getRgb()));
@@ -260,6 +286,9 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         mBookPrice.setTextColor(swatch.getRgb());
     }
 
+    /**
+     * 改变收藏状态
+     */
     private void changeCollectBtn() {
         if (mIsCollect) {
             changeCollectBtnReally(R.drawable.btn_with_already_collect,
@@ -270,10 +299,18 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
             changeCollectBtnReally(R.drawable.btn_with_flat_ripple,
                     R.drawable.ic_star_border,
                     "收藏",
-                    R.color.colorAccent);
+                    R.color.white);
         }
     }
 
+    /**
+     * 真正的修改收藏状态的方法
+     *
+     * @param bgDrawable   按钮背景色
+     * @param starDrawable 五角星资源
+     * @param text         显示内容
+     * @param textColor    显示文字的颜色
+     */
     private void changeCollectBtnReally(int bgDrawable, int starDrawable, String text, int textColor) {
         mCollectBook.setBackground(ContextCompat.getDrawable(this, bgDrawable));
         Drawable drawable = ContextCompat.getDrawable(this, starDrawable);
@@ -301,6 +338,9 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         collectBook();
     }
 
+    /**
+     * 对图书状态进行保存
+     */
     private void collectBook() {
         if (mIsCollect) {
             if (getIntent().getParcelableExtra(BOOK_LOCAL_INFO_ARGS) == null) {
@@ -337,6 +377,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                 WeChatSDK.shardText("我觉得《" + mCurrBook.getTitle() + "》不错，分享给你~ \n" + mCurrBook.getAlt());
                 return true;
             case R.id.action_ever_note:
+                //  印象笔记
                 if (EvernoteSession.getInstance().isLoggedIn()) {
                     EverNoteActivity.show(this);
                 } else {

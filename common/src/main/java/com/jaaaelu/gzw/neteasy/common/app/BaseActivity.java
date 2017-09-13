@@ -1,10 +1,13 @@
 package com.jaaaelu.gzw.neteasy.common.app;
 
+import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import java.util.List;
 
@@ -71,6 +74,25 @@ public abstract class BaseActivity extends AppCompatActivity {
         //  但点击界面导航返回时，Finish 掉当前界面
         finish();
         return super.onSupportNavigateUp();
+    }
+
+    /**
+     * 初始化 Toolbar
+     *
+     * @param toolbar Toolbar
+     */
+    protected void initToolbar(Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override

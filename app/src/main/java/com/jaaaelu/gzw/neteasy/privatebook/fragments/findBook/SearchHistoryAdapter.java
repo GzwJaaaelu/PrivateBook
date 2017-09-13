@@ -1,6 +1,5 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook;
 
-import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,13 +67,14 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
         @BindView(R.id.iv_delete_history)
         ImageView mDeleteHistory;
 
-        public SearchHistory(View itemView) {
+        SearchHistory(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //  点击后更新
                     HistorySearchInfo historySearchInfo = mHistorySearchList.get(getAdapterPosition());
                     historySearchInfo.setSearchTime(System.currentTimeMillis());
                     historySearchInfo.update();
@@ -85,6 +85,7 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
             mDeleteHistory.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //  删除历史
                     mHistorySearchList.get(getAdapterPosition()).delete();
                     mHistorySearchList.remove(getAdapterPosition());
                     notifyDataSetChanged();

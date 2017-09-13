@@ -28,6 +28,8 @@ import net.vrallev.android.task.TaskExecutor;
 import net.vrallev.android.task.TaskResult;
 
 /**
+ * 直接从印象笔记复制过来的
+ *
  * @author rwondratschek
  */
 public class CreateNoteDialogFragment extends DialogFragment {
@@ -65,7 +67,7 @@ public class CreateNoteDialogFragment extends DialogFragment {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         if (getActivity() instanceof EverNoteActivity) {
-                            ((EverNoteActivity)getActivity()).createNewNote(titleView.getEditText().getText().toString(),
+                            ((EverNoteActivity) getActivity()).createNewNote(titleView.getEditText().getText().toString(),
                                     contentView.getEditText().getText().toString(), mImageData);
                         } else {
                             throw new IllegalStateException();

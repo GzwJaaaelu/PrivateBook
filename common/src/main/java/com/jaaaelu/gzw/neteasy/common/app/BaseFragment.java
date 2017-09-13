@@ -1,12 +1,17 @@
 package com.jaaaelu.gzw.neteasy.common.app;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -16,6 +21,7 @@ import butterknife.Unbinder;
  */
 
 public abstract class BaseFragment extends Fragment {
+    public static final int MY_PERMISSIONS_REQUEST_READ_CAMERA = 0;
     private View mRootView;                     //  如果 View 需要复用的话
     private Unbinder mRootUnbinder;
 
@@ -93,5 +99,35 @@ public abstract class BaseFragment extends Fragment {
      */
     public boolean onBackPressed() {
         return false;
+    }
+
+    /**
+     * 权限回调
+     *
+     * @param requestCode  请求码
+     * @param permissions  权限列表
+     * @param grantResults 结果列表
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    CaptureActivity.show(getActivity());
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(getActivity(), "您拒绝了二维码扫描的必要权限，无法使用扫码查书的功能，您可以尝试使用关键字查书功能...", Toast.LENGTH_LONG).show();
+                }
+
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }

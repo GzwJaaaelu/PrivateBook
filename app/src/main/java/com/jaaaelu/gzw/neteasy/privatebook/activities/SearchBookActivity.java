@@ -1,6 +1,5 @@
 package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
-import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -22,7 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
-import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmptyAndLoadData;
+import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.Books;
 import com.jaaaelu.gzw.neteasy.model.HistorySearchInfo;
@@ -40,6 +39,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.getLayoutTransition;
+
 public class SearchBookActivity extends BaseActivity implements OnBookResultListener<Books>, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.et_book_info_edit)
@@ -47,7 +48,7 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
     @BindView(R.id.rl_search_history)
     RecyclerView mSearchHistory;
     @BindView(R.id.rl_search_book_info)
-    RecycleViewWithEmptyAndLoadData mSearchBookInfo;
+    RecycleViewWithEmpty mSearchBookInfo;
     @BindView(R.id.iv_go_back)
     ImageView mGoBack;
     @BindView(R.id.ll_look_around)
@@ -128,11 +129,19 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         return translateAnimation;
     }
 
+    /**
+     * 关闭可软键盘
+     */
     private void closeInput() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().peekDecorView().getWindowToken(), 0); //强制隐藏键盘
     }
 
+    /**
+     * 通过关键词找书
+     *
+     * @param keyWord 关键词
+     */
     public void queryBookByKeyWord(String keyWord) {
         mCurrKeyword = keyWord;
         if (!mRefreshLayout.isRefreshing()) {
@@ -142,6 +151,11 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         saveHistoryInfo(keyWord);
     }
 
+    /**
+     * 保存搜索历史
+     *
+     * @param keyWord 关键词
+     */
     private void saveHistoryInfo(final String keyWord) {
         BookManager.queryHistoryByKeWord(new QueryTransaction.QueryResultCallback<HistorySearchInfo>() {
             @Override
@@ -157,6 +171,12 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         }, keyWord);
     }
 
+    /**
+     * 真正保存的逻辑
+     *
+     * @param keyWord 关键词
+     * @param count   出现次数
+     */
     private void realSave(String keyWord, int count) {
         new HistorySearchInfo(keyWord,
                 System.currentTimeMillis(),
@@ -176,15 +196,6 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         });
     }
 
-    private LayoutTransition getLayoutTransition() {
-        LayoutTransition layoutTransition = new LayoutTransition();
-        layoutTransition.setAnimator(LayoutTransition.APPEARING, layoutTransition.getAnimator(LayoutTransition.APPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGE_APPEARING, layoutTransition.getAnimator(LayoutTransition.CHANGE_APPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, layoutTransition.getAnimator(LayoutTransition.CHANGE_DISAPPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGING, layoutTransition.getAnimator(LayoutTransition.CHANGING));
-        layoutTransition.setAnimator(LayoutTransition.DISAPPEARING, layoutTransition.getAnimator(LayoutTransition.DISAPPEARING));
-        return layoutTransition;
-    }
 
     @Override
     public void onSuccess(Books books) {
@@ -219,7 +230,6 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
 
     private void changeVisibility(boolean showBookInfoList) {
         mRefreshLayout.setRefreshing(false);
-//        mLookAround.setVisibility(showBookInfoList ? View.GONE : View.VISIBLE);
         mLoadingBookInfo.setVisibility(View.GONE);
         mSearchHistory.setVisibility(showBookInfoList ? View.GONE : View.VISIBLE);
         mSearchBookInfo.setVisibility(showBookInfoList ? View.VISIBLE : View.GONE);
@@ -250,5 +260,4 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
         mCurrStartIndex = BookRequest.SEARCH_START_INDEX;
         queryBookByKeyWord(mCurrKeyword);
     }
-
 }

@@ -67,7 +67,7 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
     @Override
     protected void initView() {
         super.initView();
-        initToolbar();
+        initToolbar(mToolbar);
 
         mRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
         mRefreshLayout.setOnRefreshListener(this);
@@ -89,20 +89,6 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
         });
     }
 
-    private void initToolbar() {
-        setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-    }
-
     @Override
     protected void initData() {
         super.initData();
@@ -112,6 +98,9 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
         queryEverNoteBook();
     }
 
+    /**
+     * 查询印象笔记的 NoteBook
+     */
     private void queryEverNoteBook() {
         EvernoteNoteStoreClient noteStoreClient = EvernoteSession.getInstance().getEvernoteClientFactory().getNoteStoreClient();
         noteStoreClient.listNotebooksAsync(new EvernoteCallback<List<Notebook>>() {
@@ -132,10 +121,18 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
         });
     }
 
+    /**
+     * 查询印象笔记的 Note（这才是真的笔记）
+     */
     private void queryEverNote() {
         new FindNotesTask(0, MAX_NOTES, mNotebook, mLinkedNotebook, "").start(EverNoteActivity.this);
     }
 
+    /**
+     * 找到笔记时回调
+     *
+     * @param noteRefList 笔记列表
+     */
     @TaskResult
     public void onFindNotes(List<NoteRef> noteRefList) {
         mRefreshLayout.setRefreshing(false);
@@ -148,6 +145,11 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
         }
     }
 
+    /**
+     * 创建笔记时回调
+     *
+     * @param note 创建的笔记
+     */
     @TaskResult
     public void onCreateNewNote(Note note) {
         if (note != null) {
@@ -155,11 +157,24 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
         }
     }
 
+    /**
+     * 查询到笔记内容时回调
+     *
+     * @param html 页面
+     * @param task 对应任务
+     */
     @TaskResult(id = "html")
     public void onGetNoteContentHtml(String html, GetNoteHtmlTask task) {
         WebViewActivity.show(this, task.getNoteRef(), html);
     }
 
+    /**
+     * 创建笔记
+     *
+     * @param title     标题
+     * @param content   内容
+     * @param imageData 图片数据
+     */
     public void createNewNote(String title, String content, CreateNewNoteTask.ImageData imageData) {
         new CreateNewNoteTask(title, content, imageData, mNotebook, mLinkedNotebook).start(this);
     }

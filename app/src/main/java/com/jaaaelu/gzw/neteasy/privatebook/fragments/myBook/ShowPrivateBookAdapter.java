@@ -18,7 +18,7 @@ import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBo
  * Created by Gzw on 2017/8/14 0014.
  */
 
-public class ShowPrivateBookAdapter extends RecyclerView.Adapter<PrivaterBookHolder> {
+class ShowPrivateBookAdapter extends RecyclerView.Adapter<PrivaterBookHolder> {
 
     interface ViewType {
         int SHOW_BY_LIST = 0;
@@ -44,6 +44,7 @@ public class ShowPrivateBookAdapter extends RecyclerView.Adapter<PrivaterBookHol
 
     @Override
     public PrivaterBookHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        //  不同类型显示不同界面
         if (viewType == SHOW_BY_LIST) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_book, parent, false);
             return new ShowByListHolder(view);

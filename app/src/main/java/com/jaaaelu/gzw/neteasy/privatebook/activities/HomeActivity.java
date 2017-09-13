@@ -24,7 +24,6 @@ import butterknife.OnClick;
 public class HomeActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavHelper.OnTabChangedListener<Integer> {
     private NavHelper<Integer> mNavHelper;
     private BottomNavigationView mBottomNavigation;
-    private boolean mBoolean = true;
 
     /**
      * 跳转到当前 Activity

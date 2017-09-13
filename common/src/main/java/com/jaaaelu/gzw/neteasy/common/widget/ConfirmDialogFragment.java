@@ -1,9 +1,7 @@
 package com.jaaaelu.gzw.neteasy.common.widget;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jaaaelu.gzw.neteasy.common.R;
@@ -11,9 +9,6 @@ import com.jaaaelu.gzw.neteasy.common.R2;
 import com.jaaaelu.gzw.neteasy.common.app.BaseDialogFragment;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 
 /**
  * Created by Gzw on 2017/8/24 0024.

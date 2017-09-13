@@ -1,17 +1,15 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook;
 
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.jaaaelu.gzw.neteasy.common.widget.ConfirmDialogFragment;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
-import com.jaaaelu.gzw.neteasy.util.BookManager;
 
 import butterknife.BindView;
+
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.dealEmptyData;
 
 /**
  * Created by Gzw on 2017/8/14 0014.
@@ -21,7 +19,7 @@ public class ShowByListHolder extends PrivaterBookHolder {
     @BindView(R.id.tv_book_description)
     TextView mBookDescription;
 
-    ShowByListHolder(View itemView) {
+    protected ShowByListHolder(View itemView) {
         super(itemView);
     }
 

@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 /**
  * @author rwondratschek
  */
-public abstract class BaseTask<RESULT> extends Task<RESULT> {
+abstract class BaseTask<RESULT> extends Task<RESULT> {
 
     private static final Cat CAT = new Cat("BaseTask");
 
@@ -26,7 +26,7 @@ public abstract class BaseTask<RESULT> extends Task<RESULT> {
 
     private final Class<RESULT> mResultClass;
 
-    public BaseTask(Class<RESULT> resultClass) {
+    BaseTask(Class<RESULT> resultClass) {
         mResultClass = resultClass;
     }
 
@@ -64,7 +64,7 @@ public abstract class BaseTask<RESULT> extends Task<RESULT> {
         return mResultClass;
     }
 
-    protected static void checkException(@NonNull final Exception e, @Nullable final Activity activity) {
+    private static void checkException(@NonNull final Exception e, @Nullable final Activity activity) {
         if (e instanceof EDAMUserException) {
             switch (((EDAMUserException) e).getErrorCode()) {
                 case AUTH_EXPIRED:

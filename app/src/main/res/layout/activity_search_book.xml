@@ -93,7 +93,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmptyAndLoadData
+        <com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty
             android:id="@+id/rl_search_book_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

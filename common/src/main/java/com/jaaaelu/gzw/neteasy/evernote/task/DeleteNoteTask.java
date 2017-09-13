@@ -24,7 +24,7 @@ public class DeleteNoteTask extends BaseTask<DeleteNoteTask.Result> {
         return Result.SUCCESS;
     }
 
-    public enum Result {
+    enum Result {
         SUCCESS
     }
 }

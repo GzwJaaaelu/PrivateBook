@@ -1,7 +1,6 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.statisticsbook;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -15,11 +14,9 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -40,8 +37,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import static com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment.MY_PERMISSIONS_REQUEST_READ_CAMERA;
-
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.sp2px;
 
 public class BookStatisticsFragment extends BaseFragment {
 
@@ -82,6 +78,9 @@ public class BookStatisticsFragment extends BaseFragment {
         initPieChart();
     }
 
+    /**
+     * 初始化饼状图
+     */
     private void initPieChart() {
         mTfLight = Typeface.createFromAsset(getActivity().getAssets(), "OpenSans-Light.ttf");
 
@@ -136,6 +135,7 @@ public class BookStatisticsFragment extends BaseFragment {
     protected void initData() {
         super.initData();
         mCountMap = new HashMap<>();
+        //  查询数据
         queryBook();
     }
 
@@ -148,6 +148,9 @@ public class BookStatisticsFragment extends BaseFragment {
         }
     }
 
+    /**
+     * 图书查询
+     */
     private void queryBook() {
         BookManager.queryAllBook(new QueryTransaction.QueryResultListCallback<Book>() {
             @Override
@@ -158,6 +161,9 @@ public class BookStatisticsFragment extends BaseFragment {
         });
     }
 
+    /**
+     * 设置统计信息
+     */
     private void setStatisticsInfo() {
         if (mPrivateBookList.isEmpty()) {
             mEmptyView.setVisibility(View.VISIBLE);
@@ -171,6 +177,9 @@ public class BookStatisticsFragment extends BaseFragment {
         }
     }
 
+    /**
+     * 计算标签出现次数
+     */
     private void calculateTag() {
         mCountMap.clear();
         for (Book book : mPrivateBookList) {
@@ -193,6 +202,9 @@ public class BookStatisticsFragment extends BaseFragment {
         setPieChartData();
     }
 
+    /**
+     * 设置饼状图数据
+     */
     private void setPieChartData() {
         List<PieEntry> entries = new ArrayList<>();
         for (String key : mCountMap.keySet()) {
@@ -231,6 +243,9 @@ public class BookStatisticsFragment extends BaseFragment {
         mChart.invalidate();
     }
 
+    /**
+     * 设置对喜欢的作者
+     */
     private void setFavoriteInfo() {
         String auth = calculateMyFavoriteAuth();
         String publisher = calculateMyFavoritePublisher();
@@ -240,6 +255,12 @@ public class BookStatisticsFragment extends BaseFragment {
         mPublisherBookCount.setText(publisher.split("-")[1]);
     }
 
+    /**
+     * 处理文字内容
+     *
+     * @param content 内容
+     * @return 处理好的内容
+     */
     private SpannableString getAlreadyDealText(String content) {
         SpannableString newContent = new SpannableString(content);
         newContent.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.textThirdColor)), content.indexOf("/"), content.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -247,6 +268,11 @@ public class BookStatisticsFragment extends BaseFragment {
         return newContent;
     }
 
+    /**
+     * 计算图书总价
+     *
+     * @return 计算图书总价
+     */
     private String calculatePrivateBookTotalPrice() {
         double sum = 0.0;
         for (Book book : mPrivateBookList) {
@@ -255,6 +281,11 @@ public class BookStatisticsFragment extends BaseFragment {
         return "¥ " + sum;
     }
 
+    /**
+     * 计算最喜欢的作者
+     *
+     * @return 最喜欢的作者
+     */
     private String calculateMyFavoriteAuth() {
         mCountMap.clear();
         for (Book book : mPrivateBookList) {
@@ -262,6 +293,7 @@ public class BookStatisticsFragment extends BaseFragment {
             String[] allAuth = authStr.split(",");
             for (String auth : allAuth) {
                 String newAuth = auth;
+                //  处理有很多情况 所以这里处理都是写死的，并不好
                 if (auth.contains("]")) {
                     newAuth = auth.substring(auth.indexOf("]") + 1, auth.length()).trim();
                 }
@@ -291,6 +323,11 @@ public class BookStatisticsFragment extends BaseFragment {
         return calculateMostInMap();
     }
 
+    /**
+     * 根据 map 中的数据进行返回
+     *
+     * @return 正确的统计数据
+     */
     private String calculateMostInMap() {
         String mostKey = "暂无";
         int mostValue = 0;
@@ -304,6 +341,11 @@ public class BookStatisticsFragment extends BaseFragment {
         return mostKey + "-" + mostValue + " 本";
     }
 
+    /**
+     * 计算最喜欢的出版社
+     *
+     * @return 出版社信息
+     */
     private String calculateMyFavoritePublisher() {
         mCountMap.clear();
         for (Book book : mPrivateBookList) {
@@ -326,34 +368,6 @@ public class BookStatisticsFragment extends BaseFragment {
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_READ_CAMERA);
-        }
-    }
-
-    private int sp2px(Context context, float spValue) {
-        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
-        return (int) (spValue * fontScale + 0.5f);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_CAMERA: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    CaptureActivity.show(getActivity());
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(getActivity(), "您拒绝了二维码扫描的必要权限，无法使用扫码查书的功能，您可以尝试使用关键字查书功能...", Toast.LENGTH_LONG).show();
-                }
-
-            }
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 }

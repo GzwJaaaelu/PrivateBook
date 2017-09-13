@@ -1,32 +1,24 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.activities.BookDetailActivity;
+import com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.PrivaterBookHolder;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 
 /**
  * Created by Gzw on 2017/8/14 0014.
  */
 
-public class ShowSearchBookAdapter extends RecyclerView.Adapter<ShowSearchBookAdapter.ShowByListHolder> {
+public class ShowSearchBookAdapter extends RecyclerView.Adapter<PrivaterBookHolder> {
     private List<Book> mBooks = new ArrayList<>();
 
     public ShowSearchBookAdapter(List<Book> books) {
@@ -49,13 +41,13 @@ public class ShowSearchBookAdapter extends RecyclerView.Adapter<ShowSearchBookAd
     }
 
     @Override
-    public ShowByListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PrivaterBookHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_book, parent, false);
         return new ShowByListHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ShowByListHolder holder, int position) {
+    public void onBindViewHolder(PrivaterBookHolder holder, int position) {
         holder.setBookInfo(mBooks.get(position));
     }
 
@@ -64,51 +56,15 @@ public class ShowSearchBookAdapter extends RecyclerView.Adapter<ShowSearchBookAd
         return mBooks.size();
     }
 
-    class ShowByListHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.iv_book_image)
-        ImageView mBookImage;
-        @BindView(R.id.tv_book_name)
-        TextView mBookName;
-        @BindView(R.id.tv_book_description)
-        TextView mBookDescription;
-        Context mContext;
-        Book mCurrBook;
-
+    class ShowByListHolder extends com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowByListHolder {
 
         ShowByListHolder(View itemView) {
             super(itemView);
-            mContext = itemView.getContext();
-            ButterKnife.bind(this, itemView);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    goBookDetailView();
-                }
-            });
         }
 
-        private void goBookDetailView() {
-            Intent intent = new Intent(mContext, BookDetailActivity.class);
-            intent.putExtra(BookDetailActivity.BOOK_SEARCH_INFO_ARGS, mCurrBook);
-            mContext.startActivity(intent);
-        }
-
-        void setBookInfo(Book book) {
-            mCurrBook = book;
-            mBookName.setText(book.getTitle());
-            dealEmptyData(mBookDescription, book.getAuthorStr(), "作者: ");
-            Glide.with(mContext)
-                    .load(book.getImage())
-                    .into(mBookImage);
-        }
-
-        private void dealEmptyData(TextView view, String text, String prefix) {
-            if (TextUtils.isEmpty(text)) {
-                view.setText(prefix + "暂无数据");
-            } else {
-                view.setText(prefix + text);
-            }
+        @Override
+        protected void goBookDetailView() {
+            BookDetailActivity.show(mContext, BookDetailActivity.BOOK_SEARCH_INFO_ARGS, mCurrBook);
         }
     }
 }

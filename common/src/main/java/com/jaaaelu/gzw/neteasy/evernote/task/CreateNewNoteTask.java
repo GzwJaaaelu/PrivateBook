@@ -93,7 +93,7 @@ public class CreateNewNoteTask extends BaseTask<Note> {
         }
     }
 
-    protected Note createNote(Note note) throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
+    private Note createNote(Note note) throws EDAMUserException, EDAMSystemException, TException, EDAMNotFoundException {
         if (mNotebook == null && mLinkedNotebook != null) {
             EvernoteLinkedNotebookHelper linkedNotebookHelper = EvernoteSession.getInstance().getEvernoteClientFactory().getLinkedNotebookHelper(mLinkedNotebook);
             return linkedNotebookHelper.createNoteInLinkedNotebook(note);
@@ -120,11 +120,11 @@ public class CreateNewNoteTask extends BaseTask<Note> {
             return mPath;
         }
 
-        public String getFileName() {
+        String getFileName() {
             return mFileName;
         }
 
-        public String getMimeType() {
+        String getMimeType() {
             return mMimeType;
         }
 

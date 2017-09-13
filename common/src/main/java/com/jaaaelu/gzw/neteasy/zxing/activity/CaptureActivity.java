@@ -1,11 +1,9 @@
 package com.jaaaelu.gzw.neteasy.zxing.activity;
 
-import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -44,9 +42,9 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
-import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.common.R;
 import com.jaaaelu.gzw.neteasy.common.widget.ConfirmDialogFragment;
+import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.net.BookRequest;
 import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
@@ -61,6 +59,8 @@ import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransacti
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.getLayoutTransition;
 
 
 public class CaptureActivity extends AppCompatActivity implements Callback, OnBookResultListener<Book> {
@@ -447,7 +447,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback, OnBo
                 if (tResult.getCount() == 0) {
                     mCollectBookBtn.setBackground(ContextCompat.getDrawable(CaptureActivity.this, R.drawable.btn_with_flat_ripple));
                     mCollectBookBtn.setText("收藏");
-                    mCollectBookBtn.setTextColor(ContextCompat.getColor(CaptureActivity.this, R.color.colorAccent));
+                    mCollectBookBtn.setTextColor(ContextCompat.getColor(CaptureActivity.this, R.color.white));
                     mCollectBookBtn.setEnabled(true);
                     return;
                 }
@@ -482,16 +482,6 @@ public class CaptureActivity extends AppCompatActivity implements Callback, OnBo
         if (t != null) {
             t.printStackTrace();
         }
-    }
-
-    private LayoutTransition getLayoutTransition() {
-        LayoutTransition layoutTransition = new LayoutTransition();
-        layoutTransition.setAnimator(LayoutTransition.APPEARING, layoutTransition.getAnimator(LayoutTransition.APPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGE_APPEARING, layoutTransition.getAnimator(LayoutTransition.CHANGE_APPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, layoutTransition.getAnimator(LayoutTransition.CHANGE_DISAPPEARING));
-        layoutTransition.setAnimator(LayoutTransition.CHANGING, layoutTransition.getAnimator(LayoutTransition.CHANGING));
-        layoutTransition.setAnimator(LayoutTransition.DISAPPEARING, layoutTransition.getAnimator(LayoutTransition.DISAPPEARING));
-        return layoutTransition;
     }
 
     @Override

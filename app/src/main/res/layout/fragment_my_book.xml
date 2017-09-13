@@ -43,14 +43,13 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srl_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
-        <com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmptyAndLoadData
-            android:id="@+id/rv_show_my_book"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+    <com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty
+        android:id="@+id/rv_show_my_book"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <include layout="@layout/default_empty_view"/>
 

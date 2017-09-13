@@ -60,9 +60,9 @@ public class BookNote {
          * updated : 2017-08-31 00:13:08
          * comments : 42
          * summary : 尤瓦尔的这本人类简史是一本非常惊艳之作，作者以极其广阔的思路和相当毒辣的笔触，从人类心智发展的角度分析了人类文明的变迁。
-
-
-         开头不久的一个结论...
+         * <p>
+         * <p>
+         * 开头不久的一个结论...
          * useless : 86
          * published : 2014-12-22 14:48:02
          * alt : https://book.douban.com/review/7270290/

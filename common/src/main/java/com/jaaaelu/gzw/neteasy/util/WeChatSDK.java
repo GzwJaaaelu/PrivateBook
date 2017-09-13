@@ -1,17 +1,8 @@
-package com.jaaaelu.gzw.neteasy.privatebook.helper;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
+package com.jaaaelu.gzw.neteasy.util;
 
 import com.jaaaelu.gzw.neteasy.common.Common;
 import com.jaaaelu.gzw.neteasy.common.app.PrivateBookApplication;
-import com.jaaaelu.gzw.neteasy.privatebook.App;
-import com.jaaaelu.gzw.neteasy.privatebook.R;
-import com.jaaaelu.gzw.neteasy.util.Util;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
-import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
@@ -26,7 +17,7 @@ public class WeChatSDK {
     private static IWXAPI sApi;
 
     static {
-        sApi = WXAPIFactory.createWXAPI(App.getInstance().getApplicationContext(), Common.Constance.WE_CHAT_APP_ID);
+        sApi = WXAPIFactory.createWXAPI(PrivateBookApplication.getInstance().getApplicationContext(), Common.Constance.WE_CHAT_APP_ID);
         sApi.registerApp(Common.Constance.WE_CHAT_APP_ID);
     }
 

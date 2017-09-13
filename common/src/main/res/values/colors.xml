@@ -16,4 +16,6 @@
     <color name="textThirdColor">#999999</color>
 
     <color name="alreadyCollectBook">#FFE9E9E9</color>
+
+    <color name="white">#FFFFFF</color>
 </resources>
