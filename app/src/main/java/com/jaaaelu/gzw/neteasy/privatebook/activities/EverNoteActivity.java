@@ -3,6 +3,7 @@ package com.jaaaelu.gzw.neteasy.privatebook.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -22,11 +23,15 @@ import com.evernote.edam.type.LinkedNotebook;
 import com.evernote.edam.type.Note;
 import com.evernote.edam.type.Notebook;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
+import com.jaaaelu.gzw.neteasy.common.widget.ConfirmDialogFragment;
 import com.jaaaelu.gzw.neteasy.evernote.task.CreateNewNoteTask;
+import com.jaaaelu.gzw.neteasy.evernote.task.DeleteNoteTask;
 import com.jaaaelu.gzw.neteasy.evernote.task.FindNotesTask;
 import com.jaaaelu.gzw.neteasy.evernote.task.GetNoteHtmlTask;
+import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.everNote.CreateNoteDialogFragment;
+import com.jaaaelu.gzw.neteasy.util.BookManager;
 
 import net.vrallev.android.task.TaskResult;
 
@@ -37,6 +42,7 @@ import butterknife.BindView;
 
 public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
     private static final int MAX_NOTES = 20;
+    private static final String BOOK_INFO = "book_info";
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tv_note_list)
@@ -49,6 +55,7 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
     private LinkedNotebook mLinkedNotebook;
     private MyAdapter mAdapter;
     private Notebook mNotebook;
+    private Book mCurrBook;
 
     /**
      * 跳转到当前 Activity
@@ -57,6 +64,18 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
      */
     public static void show(Context context) {
         context.startActivity(new Intent(context, EverNoteActivity.class));
+    }
+
+
+    /**
+     * 跳转到当前 Activity
+     *
+     * @param context
+     */
+    public static void show(Context context, Book book) {
+        Intent intent = new Intent(context, EverNoteActivity.class);
+        intent.putExtra(BOOK_INFO, book);
+        context.startActivity(intent);
     }
 
     @Override
@@ -80,11 +99,26 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
                 new GetNoteHtmlTask(mNoteRefList.get(position)).start(EverNoteActivity.this, "html");
             }
         });
+        mNoteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                final ConfirmDialogFragment fragment = ConfirmDialogFragment.newInstance("是否删除该条笔记？");
+                fragment.show(((FragmentActivity) view.getContext()).getSupportFragmentManager(), "");
+                fragment.onConfirmClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new DeleteNoteTask(mNoteRefList.get(position)).start(EverNoteActivity.this);
+                        fragment.dismiss();
+                    }
+                });
+                return true;
+            }
+        });
 
         mFabAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new CreateNoteDialogFragment().show(getSupportFragmentManager(), CreateNoteDialogFragment.TAG);
+                new CreateNoteDialogFragment().setBookInfo(mCurrBook).show(getSupportFragmentManager(), CreateNoteDialogFragment.TAG);
             }
         });
     }
@@ -95,6 +129,7 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
         if (!EvernoteSession.getInstance().isLoggedIn()) {
             return;
         }
+        mCurrBook = getIntent().getParcelableExtra(BOOK_INFO);
         queryEverNoteBook();
     }
 
@@ -137,7 +172,8 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
     public void onFindNotes(List<NoteRef> noteRefList) {
         mRefreshLayout.setRefreshing(false);
         if (noteRefList == null || noteRefList.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "好像没有数据返回", Toast.LENGTH_LONG).show();
+            mNoteRefList.clear();
+            mAdapter.notifyDataSetChanged();
         } else {
             mNoteRefList.clear();
             mNoteRefList.addAll(noteRefList);
@@ -153,6 +189,18 @@ public class EverNoteActivity extends BaseActivity implements SwipeRefreshLayout
     @TaskResult
     public void onCreateNewNote(Note note) {
         if (note != null) {
+            onRefresh();
+        }
+    }
+
+    /**
+     * 删除笔记时的回调
+     *
+     * @param result 被删除的结果
+     */
+    @TaskResult
+    public void onNoteDeleted(DeleteNoteTask.Result result) {
+        if (result != null) {
             onRefresh();
         }
     }

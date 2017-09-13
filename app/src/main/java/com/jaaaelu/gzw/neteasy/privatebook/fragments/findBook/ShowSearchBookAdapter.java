@@ -56,10 +56,17 @@ public class ShowSearchBookAdapter extends RecyclerView.Adapter<PrivaterBookHold
         return mBooks.size();
     }
 
-    class ShowByListHolder extends com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowByListHolder {
+    private class ShowByListHolder extends com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowByListHolder {
 
         ShowByListHolder(View itemView) {
             super(itemView);
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return true;
+                }
+            });
         }
 
         @Override

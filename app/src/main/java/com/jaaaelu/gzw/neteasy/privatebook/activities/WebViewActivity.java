@@ -86,7 +86,7 @@ public class WebViewActivity extends BaseActivity {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                if (newProgress < 100 && mHtml == null) {
+                if (newProgress < 100 ) {
                     mLoading.setProgress(newProgress);
                 }
             }
@@ -108,7 +108,6 @@ public class WebViewActivity extends BaseActivity {
             mToolbar.setTitle("豆瓣读书评分9分以上榜单");
             mShowWeb.loadUrl("https://www.douban.com/doulist/1264675/");
         }
-
         initToolbar(mToolbar);
     }
 
@@ -186,6 +185,10 @@ public class WebViewActivity extends BaseActivity {
         @SuppressWarnings("deprecation")
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            if (url.contains("douban")) {
+                return super.shouldInterceptRequest(view, url);
+            }
+
             try {
                 Response response = getEvernoteHtmlHelper().fetchEvernoteUrl(url);
                 WebResourceResponse webResourceResponse = toWebResource(response);
@@ -203,9 +206,7 @@ public class WebViewActivity extends BaseActivity {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
-            if (mHtml == null) {
-                mLoading.setVisibility(View.VISIBLE);
-            }
+            mLoading.setVisibility(View.VISIBLE);
         }
 
         @Override

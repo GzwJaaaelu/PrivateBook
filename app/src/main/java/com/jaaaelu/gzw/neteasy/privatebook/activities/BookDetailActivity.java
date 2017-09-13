@@ -379,10 +379,11 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
             case R.id.action_ever_note:
                 //  印象笔记
                 if (EvernoteSession.getInstance().isLoggedIn()) {
-                    EverNoteActivity.show(this);
+                    EverNoteActivity.show(this, mCurrBook);
                 } else {
                     EvernoteSession.getInstance().authenticate(this);
                 }
+                return true;
 
             default:
                 return false;
@@ -407,7 +408,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     @Override
     public void onLoginFinished(boolean successful) {
         if (successful) {
-            EverNoteActivity.show(this);
+            EverNoteActivity.show(this, mCurrBook);
         } else {
             Toast.makeText(this, "授权失败", Toast.LENGTH_SHORT).show();
         }

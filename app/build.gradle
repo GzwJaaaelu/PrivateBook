@@ -7,9 +7,9 @@ android {
     defaultConfig {
         applicationId "com.jaaaelu.gzw.neteasy.privatebook"
         minSdkVersion 21
-        targetSdkVersion 26
-        versionCode 2
-        versionName "1.1"
+        targetSdkVersion 25
+        versionCode 3
+        versionName "1.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -41,5 +41,4 @@ dependencies {
     compile "com.github.PhilJay:MPAndroidChart:$rootProject.ext.MPChartVersion"
 
     compile "me.wangyuwei:ParticleView:$rootProject.ext.particleVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
