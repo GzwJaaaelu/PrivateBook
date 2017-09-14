@@ -4,4 +4,5 @@
 已上架酷安应用市场       
 下载地址如下：       
 酷安  https://www.coolapk.com/apk/158711        
+豌豆荚 http://www.wandoujia.com/apps/com.jaaaelu.gzw.neteasy.privatebook       
 应用宝 http://a.app.qq.com/o/simple.jsp?pkgname=com.jaaaelu.gzw.neteasy.privatebook
