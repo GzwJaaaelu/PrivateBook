@@ -25,5 +25,7 @@ interface BookService {
                                    @Query("count") int count);
 
     @GET("{bookId}/reviews")
-    Call<BookNote> queryBookNote(@Path("bookId") String bookId);
+    Call<BookNote> queryBookNote(@Path("bookId") String bookId,
+                                 @Query("start") int start,
+                                 @Query("count") int count);
 }

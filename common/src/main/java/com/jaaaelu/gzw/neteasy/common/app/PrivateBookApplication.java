@@ -16,7 +16,7 @@ public class PrivateBookApplication extends Application {
     }
 
     private static Application sInstance;
-    private static Handler sHandler = new Handler(Looper.getMainLooper());
+    public static Handler sHandler = new Handler(Looper.getMainLooper());
 
 
     @Override
@@ -29,7 +29,7 @@ public class PrivateBookApplication extends Application {
         showToast(sInstance.getString(msgId));
     }
 
-    private static void showToast(final String msg) {
+    public static void showToast(final String msg) {
         //  主线程进行操作
         sHandler.post(new Runnable() {
             @Override

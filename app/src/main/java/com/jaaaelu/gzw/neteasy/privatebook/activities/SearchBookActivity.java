@@ -27,6 +27,7 @@ import com.jaaaelu.gzw.neteasy.model.Books;
 import com.jaaaelu.gzw.neteasy.model.HistorySearchInfo;
 import com.jaaaelu.gzw.neteasy.net.BookRequest;
 import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
+import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.SearchHistoryAdapter;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.ShowSearchBookAdapter;
@@ -199,6 +200,12 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
 
     @Override
     public void onSuccess(Books books) {
+        if (books.getBooks().isEmpty()) {
+            App.showToast("没有为您找到对应的图书信息...");
+            changeVisibility(false);
+            return;
+        }
+
         for (Book book : books.getBooks()) {
             book.saveAuthorStr();
             book.saveImagesStr();
@@ -237,6 +244,7 @@ public class SearchBookActivity extends BaseActivity implements OnBookResultList
 
     @Override
     public void onFailure(Throwable t) {
+        App.showToast("没有为您找到对应的图书信息...");
         changeVisibility(false);
         if (t != null) {
             t.printStackTrace();

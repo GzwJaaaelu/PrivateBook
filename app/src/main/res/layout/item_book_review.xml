@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="16dp">
+
+    <ImageView
+        android:id="@+id/iv_reviewer_avatar"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/app_name"
+        tools:src="@drawable/_bg"/>
+
+    <TextView
+        android:id="@+id/tv_reviewer_nick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_reviewer_avatar"
+        android:textColor="@color/textMainColor"
+        android:textSize="16sp"
+        tools:text="Durian_"/>
+
+    <TextView
+        android:id="@+id/tv_review_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_reviewer_nick"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@id/iv_reviewer_avatar"
+        android:textColor="@color/textThirdColor"
+        android:textSize="12sp"
+        tools:text="2017-09-15"/>
+
+    <TextView
+        android:id="@+id/tv_review_votes"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:drawableLeft="@drawable/ic_thumb_up"
+        android:gravity="center"
+        android:textColor="@color/textThirdColor"
+        tools:text="  21"/>
+
+    <TextView
+        android:id="@+id/tv_review_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_review_time"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/iv_reviewer_avatar"
+        android:textColor="@color/textsSecondColor"
+        tools:text="@string/note_hint"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/tv_review_content"
+        android:layout_marginTop="12dp"
+        android:layout_toRightOf="@id/iv_reviewer_avatar"
+        android:background="@color/line"/>
+
+    <RatingBar
+        android:id="@+id/rb_ratingBar"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="3dp"
+        android:layout_toRightOf="@id/tv_reviewer_nick"
+        android:numStars="5"
+        android:stepSize="1"/>
+
+</RelativeLayout>

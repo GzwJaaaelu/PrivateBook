@@ -74,7 +74,7 @@ public class BookRequest {
     }
 
     public void queryBookNote(String bookId, final OnBookResultListener<BookNote> listener) {
-        mBookService.queryBookNote(bookId).enqueue(new Callback<BookNote>() {
+        mBookService.queryBookNote(bookId, SEARCH_START_INDEX, SEARCH_TOTAL_COUNT).enqueue(new Callback<BookNote>() {
             @Override
             public void onResponse(@NonNull Call<BookNote> call, @NonNull Response<BookNote> response) {
                 if (response.isSuccessful() && response.body() != null) {

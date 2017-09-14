@@ -10,9 +10,8 @@ import com.jaaaelu.gzw.neteasy.privatebook.App;
  * SharePreferences帮助类
  */
 public class SharePreferencesHelper {
-    private static final String TAG = "SharePreferencesHelper";
-    private static final String TAG_APP_COMMON = "tag_app_common";
-    private static final String IS_NEXT_DATE = "is_next_date";
+    public static final String TAG_APP_COMMON = "tag_app_common";
+    public static final String DATE_INFO = "date_info";
     private static final Context CONTEXT = App.getInstance().getApplicationContext();
 
     /**
@@ -57,6 +56,6 @@ public class SharePreferencesHelper {
         SharedPreferences sp = getSharePreferences(tagName);
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
     }
 }

@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +32,9 @@ import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.BookNote;
 import com.jaaaelu.gzw.neteasy.net.BookRequest;
 import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
+import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
+import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.BookReviewDialog;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.jaaaelu.gzw.neteasy.util.WeChatSDK;
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
@@ -39,13 +45,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.dealEmptyData;
 
 
 public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book>,
-        OnBookResultListener<BookNote>, EvernoteLoginFragment.ResultCallback {
+        EvernoteLoginFragment.ResultCallback {
     public static final String BOOK_LOCAL_INFO_ARGS = "book_local_info_args";
     public static final String BOOK_SEARCH_INFO_ARGS = "book_search_info_args";
 
@@ -95,10 +102,15 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     TextView mBookRating;
     @BindView(R.id.rb_ratingBar)
     RatingBar mRatingBar;
+    @BindView(R.id.nsv_scroll)
+    NestedScrollView mScroll;
+    @BindView(R.id.cl_root_view)
+    CoordinatorLayout mRootView;
 
     private Book mCurrBook;
     private boolean mIsCollect;
     private Bitmap mBitmap;
+    private BookNote mBookReview;
 
     /**
      * 跳转到当前 Activity
@@ -131,6 +143,14 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         super.initView();
         initToolbar(mToolbar);
         enableBtn(false);
+
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BookReviewDialog dialog = BookReviewDialog.newInstance(mCurrBook.getId());
+                dialog.show(getSupportFragmentManager(), "");
+            }
+        });
     }
 
     /**
@@ -140,7 +160,6 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
      */
     private void enableBtn(boolean isEnable) {
         mCollectBook.setEnabled(isEnable);
-        mFab.setEnabled(isEnable);
     }
 
     @Override
@@ -179,8 +198,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         enableBtn(true);
         changeCollectBtn();
 
-        //  去查找是否有图书的笔记
-        BookRequest.getInstance().queryBookNote(mCurrBook.getId(), this);
+
     }
 
     /**
@@ -232,6 +250,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
 
     /**
      * Url 转为 Bitmap
+     *
      * @param image 图片地址
      */
     private void getBitmapFormUrl(final String image) {
@@ -393,16 +412,6 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    @Override
-    public void onSuccess(BookNote bookNote) {
-
-    }
-
-    @Override
-    public void onFailure(Throwable t) {
-
     }
 
     @Override

@@ -29,6 +29,7 @@ public class BookManager {
 
     public static void queryAllBook(QueryTransaction.QueryResultListCallback<Book> callback) {
         SQLite.select().from(Book.class)
+                .orderBy(Book_Table.title.asc())
                 .async()
                 .queryListResultCallback(callback)
                 .execute();

@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.asyncclient.EvernoteCallback;
@@ -30,8 +29,7 @@ import com.jaaaelu.gzw.neteasy.evernote.task.FindNotesTask;
 import com.jaaaelu.gzw.neteasy.evernote.task.GetNoteHtmlTask;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
-import com.jaaaelu.gzw.neteasy.privatebook.fragments.everNote.CreateNoteDialogFragment;
-import com.jaaaelu.gzw.neteasy.util.BookManager;
+import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.everNote.CreateNoteDialogFragment;
 
 import net.vrallev.android.task.TaskResult;
 

@@ -2,27 +2,22 @@ package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.evernote.client.android.EvernoteSession;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.App;
+import com.jaaaelu.gzw.neteasy.privatebook.MainActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.findBook.FindBookFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.statisticsbook.BookStatisticsFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.NavHelper;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.SharePreferencesHelper;
-
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import com.jaaaelu.gzw.neteasy.util.Dateutil;
 
 
 public class HomeActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavHelper.OnTabChangedListener<Integer> {
@@ -30,7 +25,6 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
     private BottomNavigationView mBottomNavigation;
     private static final int DOUBLE_EXIT_TIME = 1500;
     private long mLastTime = 0;
-    private Toast mToast;
 
     /**
      * 跳转到当前 Activity
@@ -44,6 +38,15 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     protected int getLayoutResId() {
         return R.layout.activity_home;
+    }
+
+    @Override
+    protected void initWindows() {
+        super.initWindows();
+        if (!Dateutil.getDate().equals(SharePreferencesHelper.getString(SharePreferencesHelper.DATE_INFO, SharePreferencesHelper.TAG_APP_COMMON))) {
+            MainActivity.show(this);
+            SharePreferencesHelper.putString(SharePreferencesHelper.DATE_INFO, Dateutil.getDate(), SharePreferencesHelper.TAG_APP_COMMON);
+        }
     }
 
     @Override
@@ -73,8 +76,6 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
         Menu menu = mBottomNavigation.getMenu();
         //  手动触发第一次点击 选中 Home
         menu.performIdentifierAction(R.id.navigation_my_book, 0);
-
-        mToast = Toast.makeText(this, "再次按返回键退出", Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -93,7 +94,7 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void onBackPressed() {
         if (System.currentTimeMillis() - mLastTime > DOUBLE_EXIT_TIME) {
-            mToast.show();
+            App.showToast("再次按返回键退出");
             mLastTime = System.currentTimeMillis();
         } else {
             super.onBackPressed();
