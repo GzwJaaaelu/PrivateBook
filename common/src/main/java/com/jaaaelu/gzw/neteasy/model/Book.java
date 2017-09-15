@@ -17,6 +17,11 @@ import java.util.List;
  */
 @Table(database = AppDatabase.class)
 public class Book extends BaseModel implements Parcelable {
+    private static final String TAG_TYPE = "default";
+    public static final int READ_TYPE_NO_STATE = -1;
+    public static final int READ_TYPE_READING = 0;
+    public static final int READ_TYPE_ALREADY_READ = 1;
+    public static final int READ_TYPE_WANNA_READ = 2;
 
     /**
      * rating : {"max":10,"numRaters":11315,"average":"9.2","min":0}
@@ -105,6 +110,26 @@ public class Book extends BaseModel implements Parcelable {
     private List<String> translator;
     @Column
     private String translatorStr;
+    @Column
+    private String customTag = TAG_TYPE;
+    @Column
+    private int readState = READ_TYPE_NO_STATE;
+
+    public String getCustomTag() {
+        return customTag;
+    }
+
+    public void setCustomTag(String customTag) {
+        this.customTag = customTag;
+    }
+
+    public int getReadState() {
+        return readState;
+    }
+
+    public void setReadState(int readState) {
+        this.readState = readState;
+    }
 
     public RatingBean getRating() {
         return rating;
@@ -613,6 +638,9 @@ public class Book extends BaseModel implements Parcelable {
     }
 
 
+    public Book() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -648,9 +676,8 @@ public class Book extends BaseModel implements Parcelable {
         dest.writeString(this.tagsStr);
         dest.writeStringList(this.translator);
         dest.writeString(this.translatorStr);
-    }
-
-    public Book() {
+        dest.writeString(this.customTag);
+        dest.writeInt(this.readState);
     }
 
     protected Book(Parcel in) {
@@ -682,6 +709,8 @@ public class Book extends BaseModel implements Parcelable {
         this.tagsStr = in.readString();
         this.translator = in.createStringArrayList();
         this.translatorStr = in.readString();
+        this.customTag = in.readString();
+        this.readState = in.readInt();
     }
 
     public static final Creator<Book> CREATOR = new Creator<Book>() {

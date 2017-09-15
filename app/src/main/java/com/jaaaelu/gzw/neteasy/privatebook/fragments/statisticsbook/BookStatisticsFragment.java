@@ -173,33 +173,43 @@ public class BookStatisticsFragment extends BaseFragment {
             mPrivateBookTotalCount.setText("" + mPrivateBookList.size());
             mPrivateBookTotalPrice.setText(calculatePrivateBookTotalPrice());
             setFavoriteInfo();
-            calculateTag();
+            calculateReadState();
         }
     }
 
     /**
      * 计算标签出现次数
      */
-    private void calculateTag() {
+    private void calculateReadState() {
         mCountMap.clear();
         for (Book book : mPrivateBookList) {
-            if (book.getTagsStr().split(",").length <= 1) {
-                Integer count = mCountMap.get("无分类");
-                mCountMap.put("无分类", ((count == null ? 0 : count) + 1));
-                continue;
-            }
-            String tag = book.getTagsStr().split(",")[1].split("=")[1].replace('\'', ' ').trim();
-            boolean containsTag = mCountMap.containsKey(tag);
-            Log.e("TAG", tag);
+            String readState = readStateDescribe(book.getReadState());
+            boolean containsTag = mCountMap.containsKey(readState);
             if (containsTag) {
-                int count = mCountMap.get(tag);
-                mCountMap.put(tag, (count + 1));
+                int count = mCountMap.get(readState);
+                mCountMap.put(readState, (count + 1));
             } else {
-                mCountMap.put(tag, 1);
+                mCountMap.put(readState, 1);
             }
         }
 
         setPieChartData();
+    }
+
+    private String readStateDescribe(int readState) {
+        String readStateDescribe = "未标记";
+        switch (readState) {
+            case Book.READ_TYPE_WANNA_READ:
+                readStateDescribe = "想看看";
+                break;
+            case Book.READ_TYPE_READING:
+                readStateDescribe = "正读呢";
+                break;
+            case Book.READ_TYPE_ALREADY_READ:
+                readStateDescribe = "读完啦";
+                break;
+        }
+        return readStateDescribe;
     }
 
     /**

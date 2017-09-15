@@ -2,10 +2,10 @@ package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -13,13 +13,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,9 +31,6 @@ import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.BookNote;
-import com.jaaaelu.gzw.neteasy.net.BookRequest;
-import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
-import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.BookReviewDialog;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
@@ -45,10 +43,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.dealEmptyData;
+import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.getLayoutTransition;
 
 
 public class BookDetailActivity extends BaseActivity implements QueryTransaction.QueryResultCallback<Book>,
@@ -106,11 +104,21 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     NestedScrollView mScroll;
     @BindView(R.id.cl_root_view)
     CoordinatorLayout mRootView;
+    @BindView(R.id.rb_wanna_read)
+    RadioButton mWannaRead;
+    @BindView(R.id.rb_already_read)
+    RadioButton mAlreadyRead;
+    @BindView(R.id.rb_reading)
+    RadioButton mNotRead;
+    @BindView(R.id.rg_radio_state)
+    RadioGroup mRadioState;
 
     private Book mCurrBook;
     private boolean mIsCollect;
     private Bitmap mBitmap;
     private BookNote mBookReview;
+    private Palette.Swatch mSwatch;
+    private int mCurrReadState = -1;
 
     /**
      * 跳转到当前 Activity
@@ -143,14 +151,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         super.initView();
         initToolbar(mToolbar);
         enableBtn(false);
-
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BookReviewDialog dialog = BookReviewDialog.newInstance(mCurrBook.getId());
-                dialog.show(getSupportFragmentManager(), "");
-            }
-        });
+        mRootView.setLayoutTransition(getLayoutTransition());
     }
 
     /**
@@ -197,8 +198,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         setBookInfo();
         enableBtn(true);
         changeCollectBtn();
-
-
+        setReadState();
     }
 
     /**
@@ -246,6 +246,29 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
 
         //  获取图书图片的 Bitmap
         getBitmapFormUrl(image);
+
+        mCurrReadState = mCurrBook.getReadState();
+    }
+
+    private void setReadState() {
+        switch (mCurrReadState) {
+            case Book.READ_TYPE_WANNA_READ:
+                mWannaRead.setChecked(true);
+                break;
+            case Book.READ_TYPE_ALREADY_READ:
+                mAlreadyRead.setChecked(true);
+                break;
+            case Book.READ_TYPE_READING:
+                mNotRead.setChecked(true);
+                break;
+            default:
+                cleanRB();
+                break;
+        }
+    }
+
+    private void cleanRB() {
+        mRadioState.clearCheck();
     }
 
     /**
@@ -287,6 +310,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
             public void onGenerated(Palette palette) {
                 Palette.Swatch swatch = palette.getVibrantSwatch();
                 if (swatch != null) {
+                    mSwatch = swatch;
                     changeThemeColor(swatch);
                 }
             }
@@ -303,6 +327,12 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         getWindow().setStatusBarColor((swatch.getRgb()));
 
         mBookPrice.setTextColor(swatch.getRgb());
+
+        mFab.setBackgroundTintList(ColorStateList.valueOf(swatch.getRgb()));
+
+        mWannaRead.setButtonTintList(ColorStateList.valueOf(swatch.getRgb()));
+        mAlreadyRead.setButtonTintList(ColorStateList.valueOf(swatch.getRgb()));
+        mNotRead.setButtonTintList(ColorStateList.valueOf(swatch.getRgb()));
     }
 
     /**
@@ -315,11 +345,14 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                     "已收藏",
                     R.color.colorPrimary);
         } else {
+            cleanRB();
+            mCurrReadState = Book.READ_TYPE_NO_STATE;
             changeCollectBtnReally(R.drawable.btn_with_flat_ripple,
                     R.drawable.ic_star_border,
                     "收藏",
                     R.color.white);
         }
+        mRadioState.setVisibility(mIsCollect ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -346,7 +379,12 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                 changeCollectBtn();
                 break;
             case R.id.fab:
-
+                int color = 0;
+                if (mSwatch != null) {
+                    color = mSwatch.getRgb();
+                }
+                BookReviewDialog dialog = BookReviewDialog.newInstance(mCurrBook.getId(), color);
+                dialog.show(getSupportFragmentManager(), "");
                 break;
         }
     }
@@ -354,7 +392,26 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     @Override
     protected void onPause() {
         super.onPause();
+        getReadState();
         collectBook();
+    }
+
+    private void getReadState() {
+        switch (mRadioState.getCheckedRadioButtonId()) {
+            case R.id.rb_wanna_read:
+                mCurrReadState = Book.READ_TYPE_WANNA_READ;
+                break;
+            case R.id.rb_already_read:
+                mCurrReadState = Book.READ_TYPE_ALREADY_READ;
+                break;
+            case R.id.rb_reading:
+                mCurrReadState = Book.READ_TYPE_READING;
+                break;
+            default:
+                mCurrReadState = Book.READ_TYPE_NO_STATE;
+                break;
+        }
+        mCurrBook.setReadState(mCurrReadState);
     }
 
     /**
@@ -364,6 +421,8 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         if (mIsCollect) {
             if (getIntent().getParcelableExtra(BOOK_LOCAL_INFO_ARGS) == null) {
                 BookManager.saveBook(mCurrBook);
+            } else {
+                BookManager.updateBook(mCurrBook);
             }
         } else {
             BookManager.deleteBook(mCurrBook);
@@ -376,6 +435,8 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
             return;
         }
         mIsCollect = true;
+        mCurrReadState = tResult.getItem(0).getReadState();
+        setReadState();
         changeCollectBtn();
     }
 

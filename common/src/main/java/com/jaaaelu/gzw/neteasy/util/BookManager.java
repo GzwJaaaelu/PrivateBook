@@ -62,6 +62,11 @@ public class BookManager {
         DataChange = true;
     }
 
+    public static void updateBook(Book book) {
+        book.update();
+        DataChange = true;
+    }
+
     public static void deleteBook(Book book) {
         book.delete();
         DataChange = true;
@@ -85,7 +90,9 @@ public class BookManager {
             rmbPrice = Double.valueOf(price.split("円")[0]) * 0.06087;
         } else if (price.contains("HK$")) {
             rmbPrice = Double.valueOf(price.replace('$', ' ').split(" ")[1]) * 0.8437;
-        } else {
+        } else if (price.contains("GBP")) {
+            rmbPrice = Double.valueOf(price.split(" ")[1].trim()) * 8.77727741;
+        } else  {
             try {
                 rmbPrice = Double.valueOf(price);
             } catch (Exception e) {

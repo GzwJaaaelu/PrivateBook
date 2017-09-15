@@ -1,6 +1,9 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -28,6 +31,7 @@ import butterknife.ButterKnife;
 class BookReviewAdapter extends RecyclerView.Adapter<BookReviewAdapter.BookReviewHolder> {
     private List<BookNote.ReviewsBean> mReviews = new ArrayList<>();
     private Context mContext;
+    private int mColorRes;
 
     BookReviewAdapter() {
     }
@@ -37,7 +41,11 @@ class BookReviewAdapter extends RecyclerView.Adapter<BookReviewAdapter.BookRevie
         this.mReviews = reviews;
     }
 
-    public void setReviews(List<BookNote.ReviewsBean> reviews) {
+    BookReviewAdapter(int colorRes) {
+        mColorRes = colorRes;
+    }
+
+    void setReviews(List<BookNote.ReviewsBean> reviews) {
         mReviews.clear();
         mReviews.addAll(reviews);
         notifyDataSetChanged();
@@ -95,6 +103,11 @@ class BookReviewAdapter extends RecyclerView.Adapter<BookReviewAdapter.BookRevie
             }
             mRatingBar.setRating(TextUtils.isEmpty(review.getRating().getValue()) ? 0.0f
                     : Float.valueOf(review.getRating().getValue()));
+            if (mColorRes != 0) {
+                mRatingBar.setProgressTintList(ColorStateList.valueOf(mColorRes));
+                mRatingBar.setProgressBackgroundTintList(ColorStateList.valueOf(mColorRes));
+                mRatingBar.setSecondaryProgressTintList(ColorStateList.valueOf(mColorRes));
+            }
         }
     }
 }

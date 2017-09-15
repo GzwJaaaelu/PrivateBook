@@ -109,7 +109,7 @@
     <string name="look_around">随便看看</string>
     <string name="private_book_total_price">藏书总价</string>
     <string name="delete_book">删除</string>
-    <string name="book_analyze">藏书基因分析</string>
+    <string name="book_analyze">藏书状态分析</string>
     <string name="action_share">分享</string>
 
 
@@ -153,6 +153,9 @@
     <string name="note_hint">☆ 本应用中只能添加笔记和查看笔记，暂不支持更新…</string>
     <string name="note_title">笔记标题</string>
     <string name="note_content">笔记内容</string>
+    <string name="wanna_read">想读</string>
+    <string name="already_read">已读</string>
+    <string name="not_read">在读</string>
     <integer name="wallapop_original_width">1024</integer>
     <integer name="wallapop_original_height">1024</integer>
 </resources>

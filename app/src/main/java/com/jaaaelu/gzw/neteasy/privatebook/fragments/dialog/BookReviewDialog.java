@@ -28,19 +28,22 @@ import com.jaaaelu.gzw.neteasy.privatebook.R;
 
 public class BookReviewDialog extends BottomSheetDialogFragment implements OnBookResultListener<BookNote> {
     private static final String BOOK_ID = "book_id";
+    private static final String REVIEW_THEME_COLOR = "review_theme_color";
     private RecyclerView mBookReview;
     private BookNote mReviewData;
     private BookReviewAdapter mAdapter;
     private Toolbar mToolbar;
+    private int mColorRes;
 
     public BookReviewDialog() {
         // Required empty public constructor
     }
 
-    public static BookReviewDialog newInstance(String bookId) {
+    public static BookReviewDialog newInstance(String bookId, int color) {
 
         Bundle args = new Bundle();
         args.putString(BOOK_ID, bookId);
+        args.putInt(REVIEW_THEME_COLOR, color);
         BookReviewDialog fragment = new BookReviewDialog();
         fragment.setArguments(args);
         return fragment;
@@ -54,8 +57,11 @@ public class BookReviewDialog extends BottomSheetDialogFragment implements OnBoo
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mBookReview = (RecyclerView) view.findViewById(R.id.rv_book_review);
         mBookReview.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter = new BookReviewAdapter();
+        mAdapter = new BookReviewAdapter(mColorRes);
         mBookReview.setAdapter(mAdapter);
+        if (mColorRes != 0) {
+            mToolbar.setTitleTextColor(mColorRes);
+        }
         return view;
     }
 
@@ -70,6 +76,7 @@ public class BookReviewDialog extends BottomSheetDialogFragment implements OnBoo
         super.onCreate(savedInstanceState);
         //  去查找是否有图书的笔记
         BookRequest.getInstance().queryBookNote(getArguments().getString(BOOK_ID, ""), this);
+        mColorRes = getArguments().getInt(REVIEW_THEME_COLOR, 0);
     }
 
     /**
