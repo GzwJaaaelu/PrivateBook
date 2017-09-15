@@ -18,10 +18,10 @@ import java.util.List;
 @Table(database = AppDatabase.class)
 public class Book extends BaseModel implements Parcelable {
     private static final String TAG_TYPE = "default";
-    public static final int READ_TYPE_NO_STATE = -1;
-    public static final int READ_TYPE_READING = 0;
-    public static final int READ_TYPE_ALREADY_READ = 1;
-    public static final int READ_TYPE_WANNA_READ = 2;
+    public static final int READ_TYPE_NO_STATE = 0;
+    public static final int READ_TYPE_WANNA_READ = 1;
+    public static final int READ_TYPE_READING = 2;
+    public static final int READ_TYPE_ALREADY_READ = 3;
 
     /**
      * rating : {"max":10,"numRaters":11315,"average":"9.2","min":0}
