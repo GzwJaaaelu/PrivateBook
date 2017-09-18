@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -87,6 +88,11 @@ public class UiTool {
     public static int sp2px(Context context, float spValue) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
+    }
+
+    public static float dipToPx(Resources resources, float dp) {
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics);
     }
 
     public static LayoutTransition getLayoutTransition() {

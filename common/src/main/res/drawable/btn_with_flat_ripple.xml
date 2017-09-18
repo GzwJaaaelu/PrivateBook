@@ -2,6 +2,6 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
         android:color="#eee">
 
-    <item android:drawable="@drawable/btn_with_flat_radius"></item>
+    <item android:drawable="@drawable/btn_with_flat_radius"/>
 
 </ripple>

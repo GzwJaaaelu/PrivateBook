@@ -1,14 +1,25 @@
 package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
+import com.jaaaelu.gzw.neteasy.common.tools.UiTool;
+import com.jaaaelu.gzw.neteasy.common.widget.ConfirmDialogFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.MainActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
@@ -17,10 +28,20 @@ import com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.statisticsbook.BookStatisticsFragment;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.NavHelper;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.SharePreferencesHelper;
+import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.jaaaelu.gzw.neteasy.util.Dateutil;
+
+import java.util.Objects;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+import static android.animation.Animator.DURATION_INFINITE;
 
 
 public class HomeActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavHelper.OnTabChangedListener<Integer> {
+    @BindView(R.id.fab_action)
+    FloatingActionButton mFab;
     private NavHelper<Integer> mNavHelper;
     private BottomNavigationView mBottomNavigation;
     private static final int DOUBLE_EXIT_TIME = 1500;
@@ -54,6 +75,29 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
         super.initView();
         mBottomNavigation = (BottomNavigationView) findViewById(R.id.nbv_navigation);
         mBottomNavigation.setOnNavigationItemSelectedListener(this);
+
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                syncBook();
+            }
+        });
+    }
+
+    private void syncBook() {
+        final ConfirmDialogFragment fragment = ConfirmDialogFragment.newInstance("是否将全部图书信息同步至印象笔记？");
+        fragment.show(getSupportFragmentManager(), "");
+        fragment.onConfirmClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ObjectAnimator animator = ObjectAnimator.ofFloat(mFab, "rotation", 0, 359);
+                animator.setDuration(1000);
+                animator.setRepeatCount(ObjectAnimator.INFINITE);
+                animator.setInterpolator(new LinearInterpolator());
+                animator.start();
+                fragment.dismiss();
+            }
+        });
     }
 
     @Override
@@ -88,7 +132,24 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onTabChanged(NavHelper.Tab<Integer> oldTab, NavHelper.Tab<Integer> newTab) {
+        //  对浮动按钮进行隐藏与显示的动画
+        float transY = 0;
+        float rotation = 0;
+        if (Objects.equals(newTab.extra, R.string.title_my_book)) {
+            //  主界面时显示
+            rotation = 360;
+        } else {
+            transY = UiTool.dipToPx(getResources(), 76);
+        }
 
+        // 开始动画
+        // 旋转，Y轴位移，弹性插值器，时间
+        mFab.animate()
+                .rotation(rotation)
+                .translationY(transY)
+                .setInterpolator(new AnticipateOvershootInterpolator(1))
+                .setDuration(480)
+                .start();
     }
 
     @Override
