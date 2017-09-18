@@ -10,7 +10,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import com.jaaaelu.gzw.neteasy.common.app.BaseFragment;
 import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty;
@@ -18,9 +22,11 @@ import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity;
+import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,9 +47,12 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
     ImageView mIvGoAddBook;
     @BindView(R.id.srl_refresh_layout)
     SwipeRefreshLayout mRefreshLayout;
+    @BindView(R.id.sp_show_tag)
+    Spinner mShowTag;
     private boolean mShowList = true;
     private List<Book> mBooks;
     private ShowPrivateBookAdapter mAdapter;
+    private ArrayList<String> mTagList;
 
     public MyBookFragment() {
         // Required empty public constructor
@@ -68,6 +77,29 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
                 queryBook();
             }
         };
+
+        mTagList = new ArrayList<>();
+        mTagList.add("我的藏书");
+        SpinnerAdapter adapter =
+                new ArrayAdapter<>(getActivity(), R.layout.item_tag_in_toolbar, mTagList);
+
+        mShowTag.setAdapter(adapter);
+
+        mShowTag.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != 0) {
+                    queryBookByTag(position);
+                } else {
+                    queryBook();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
@@ -80,12 +112,48 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
         BookManager.queryAllBook(new QueryTransaction.QueryResultListCallback<Book>() {
             @Override
             public void onListQueryResult(QueryTransaction transaction, @NonNull List<Book> tResult) {
-                mBooks.clear();
-                mBooks.addAll(tResult);
-                mAdapter.notifyDataSetChanged();
-                mRefreshLayout.setRefreshing(false);
+                changeOldDBData(tResult);
+                setBookData(tResult);
+                addTag();
             }
         });
+    }
+
+    private void queryBookByTag(int position) {
+        BookManager.queryBookByTag(new QueryTransaction.QueryResultListCallback<Book>() {
+            @Override
+            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Book> tResult) {
+                setBookData(tResult);
+            }
+        }, BookManager.getCustomTag().get(position - 1));
+    }
+
+    private void changeOldDBData(List<Book> tResult) {
+        for (Book book : tResult) {
+            if ("default".equals(book.getCustomTag())) {
+                book.setCustomTag(Book.TAG_TYPE);
+            }
+        }
+    }
+
+    private void setBookData(List<Book> tResult) {
+        mBooks.clear();
+        mBooks.addAll(tResult);
+        mAdapter.notifyDataSetChanged();
+        mRefreshLayout.setRefreshing(false);
+    }
+
+    private void addTag() {
+        mTagList.clear();
+        HashSet<String> set = new HashSet<>();
+        for (Book book : mBooks) {
+            set.add(book.getCustomTag());
+        }
+
+        mTagList.add("我的藏书");
+        mTagList.addAll(set);
+        set.add(Book.TAG_TYPE);
+        BookManager.setCustomTag(set);
     }
 
     @Override

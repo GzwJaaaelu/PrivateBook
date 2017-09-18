@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              tools:context="com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment"
-              android:orientation="vertical">
+              android:orientation="vertical"
+              tools:context="com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.MyBookFragment">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -13,17 +13,17 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary">
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <TextView
-                style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            <Spinner
+                android:id="@+id/sp_show_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/title_my_book"/>
+                android:gravity="center"/>
 
             <ImageView
                 android:id="@+id/iv_recyclerView_style"
@@ -31,10 +31,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_show_list_book"
-                android:contentDescription="@string/app_name"
                 android:clickable="true"
-                android:foreground="?attr/selectableItemBackground"/>
+                android:contentDescription="@string/app_name"
+                android:foreground="?attr/selectableItemBackground"
+                android:src="@drawable/ic_show_list_book"/>
 
         </android.support.v7.widget.Toolbar>
 

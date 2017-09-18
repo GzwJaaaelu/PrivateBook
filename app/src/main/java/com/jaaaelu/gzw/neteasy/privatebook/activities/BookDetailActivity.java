@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -16,12 +17,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,18 +37,22 @@ import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.BookNote;
+import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.BookReviewDialog;
+import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.EditTextDialogFragment;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.jaaaelu.gzw.neteasy.util.WeChatSDK;
 import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.dealEmptyData;
@@ -53,6 +63,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         EvernoteLoginFragment.ResultCallback {
     public static final String BOOK_LOCAL_INFO_ARGS = "book_local_info_args";
     public static final String BOOK_SEARCH_INFO_ARGS = "book_search_info_args";
+    private static final String ADD_NEW_TAG = "添加新分类";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -112,6 +123,12 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     RadioButton mNotRead;
     @BindView(R.id.rg_radio_state)
     RadioGroup mRadioState;
+    @BindView(R.id.sp_show_tag)
+    Spinner mShowTag;
+    @BindView(R.id.ll_custom_tag)
+    LinearLayout mCustomTag;
+    @BindView(R.id.rl_book_detail_root)
+    RelativeLayout mBookDetailRoot;
 
     private Book mCurrBook;
     private boolean mIsCollect;
@@ -119,6 +136,8 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
     private BookNote mBookReview;
     private Palette.Swatch mSwatch;
     private int mCurrReadState = -1;
+    private ArrayList<String> mTagList = new ArrayList<>();
+    private ArrayAdapter<String> mAdapter;
 
     /**
      * 跳转到当前 Activity
@@ -151,7 +170,58 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         super.initView();
         initToolbar(mToolbar);
         enableBtn(false);
-        mRootView.setLayoutTransition(getLayoutTransition());
+        mBookDetailRoot.setLayoutTransition(getLayoutTransition());
+
+        mShowTag.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (ADD_NEW_TAG.equals(mTagList.get(position))) {
+                    dialogAddTag();
+                } else {
+                    mCurrBook.setCustomTag(mTagList.get(position));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        mShowTag.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                App.showToast(mTagList.get(position));
+                return false;
+            }
+        });
+    }
+
+    private void dialogAddTag() {
+        EditTextDialogFragment fragment = EditTextDialogFragment.newInstance("添加新分类", getBookThemeColor());
+        fragment.show(getSupportFragmentManager(), "");
+        fragment.setContentListener(new EditTextDialogFragment.ChangeContentListener() {
+            @Override
+            public void changeContent(String newContent) {
+                changeSpinnerSelect(newContent);
+            }
+        });
+    }
+
+    private void changeSpinnerSelect(String newContent) {
+        mTagList.add(mTagList.size() - 1, newContent);
+        mAdapter.notifyDataSetChanged();
+        mShowTag.setSelection(mTagList.size() - 2);
+
+        mCurrBook.setCustomTag(newContent);
+    }
+
+    private int getBookThemeColor() {
+        int color = getResources().getColor(R.color.colorPrimary);
+        if (mSwatch != null) {
+            color = mSwatch.getRgb();
+        }
+        return color;
     }
 
     /**
@@ -247,6 +317,11 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         //  获取图书图片的 Bitmap
         getBitmapFormUrl(image);
 
+        mTagList.addAll(BookManager.getCustomTag());
+        mTagList.add(ADD_NEW_TAG);
+        mAdapter = new ArrayAdapter<>(this, R.layout.item_tag_in_activity, mTagList);
+        mShowTag.setAdapter(mAdapter);
+        mShowTag.setSelection(mAdapter.getPosition(mCurrBook.getCustomTag()));
         mCurrReadState = mCurrBook.getReadState();
     }
 
@@ -344,6 +419,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                     R.drawable.ic_star,
                     "已收藏",
                     R.color.colorPrimary);
+
         } else {
             cleanRB();
             mCurrReadState = Book.READ_TYPE_NO_STATE;
@@ -353,6 +429,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                     R.color.white);
         }
         mRadioState.setVisibility(mIsCollect ? View.VISIBLE : View.GONE);
+        mCustomTag.setVisibility(mIsCollect ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -379,11 +456,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
                 changeCollectBtn();
                 break;
             case R.id.fab:
-                int color = 0;
-                if (mSwatch != null) {
-                    color = mSwatch.getRgb();
-                }
-                BookReviewDialog dialog = BookReviewDialog.newInstance(mCurrBook.getId(), color);
+                BookReviewDialog dialog = BookReviewDialog.newInstance(mCurrBook.getId(), getBookThemeColor());
                 dialog.show(getSupportFragmentManager(), "");
                 break;
         }
@@ -438,6 +511,7 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
         mCurrReadState = tResult.getItem(0).getReadState();
         setReadState();
         changeCollectBtn();
+        mShowTag.setSelection(mAdapter.getPosition(tResult.getItem(0).getCustomTag()));
     }
 
     @Override

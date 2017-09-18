@@ -156,6 +156,7 @@
     <string name="wanna_read">想读</string>
     <string name="already_read">已读</string>
     <string name="not_read">在读</string>
+    <string name="tag_show">分类:</string>
     <integer name="wallapop_original_width">1024</integer>
     <integer name="wallapop_original_height">1024</integer>
 </resources>

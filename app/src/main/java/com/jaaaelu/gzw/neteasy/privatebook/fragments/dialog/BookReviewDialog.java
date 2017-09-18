@@ -76,7 +76,7 @@ public class BookReviewDialog extends BottomSheetDialogFragment implements OnBoo
         super.onCreate(savedInstanceState);
         //  去查找是否有图书的笔记
         BookRequest.getInstance().queryBookNote(getArguments().getString(BOOK_ID, ""), this);
-        mColorRes = getArguments().getInt(REVIEW_THEME_COLOR, 0);
+        mColorRes = getArguments().getInt(REVIEW_THEME_COLOR);
     }
 
     /**

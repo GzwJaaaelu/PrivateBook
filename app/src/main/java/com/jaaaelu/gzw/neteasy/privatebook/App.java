@@ -35,5 +35,6 @@ public class App extends PrivateBookApplication {
                 .setLocale(Locale.SIMPLIFIED_CHINESE)
                 .build(CONSUMER_KEY, CONSUMER_SECRET)
                 .asSingleton();
+
     }
 }

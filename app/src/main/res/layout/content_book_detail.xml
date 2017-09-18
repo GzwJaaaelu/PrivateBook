@@ -11,6 +11,7 @@
     tools:showIn="@layout/activity_book_detail">
 
     <RelativeLayout
+        android:id="@+id/rl_book_detail_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp">
@@ -61,7 +62,7 @@
             android:layout_marginTop="3dp"
             android:textColor="@color/textsSecondColor"
             android:textSize="15sp"
-            android:visibility="visible"
+            android:visibility="gone"
             tools:text="分类: 人文"/>
 
         <RatingBar
@@ -87,12 +88,37 @@
             android:visibility="visible"
             tools:text="评分: 9.7 分 / 2030 人 "/>
 
+        <LinearLayout
+            android:id="@+id/ll_custom_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_book_rating"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/tag_show"
+                android:textColor="@color/textsSecondColor"
+                android:textSize="15sp"/>
+
+            <Spinner
+                android:id="@+id/sp_show_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:backgroundTint="@color/textsSecondColor"/>
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tv_book_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_book_rating"
-            android:layout_marginTop="9dp"
+            android:layout_below="@id/ll_custom_tag"
+            android:layout_marginTop="3dp"
             android:textColor="@color/colorPrimary"
             android:textSize="15sp"
             tools:text="定价: 49.50元"/>

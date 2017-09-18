@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Table(database = AppDatabase.class)
 public class Book extends BaseModel implements Parcelable {
-    private static final String TAG_TYPE = "default";
+    public static final String TAG_TYPE = "默认分类";
     public static final int READ_TYPE_NO_STATE = 0;
     public static final int READ_TYPE_WANNA_READ = 1;
     public static final int READ_TYPE_READING = 2;

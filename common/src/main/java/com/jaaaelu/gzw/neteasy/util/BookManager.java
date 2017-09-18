@@ -11,6 +11,10 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by Gzw on 2017/8/25 0025.
@@ -18,6 +22,7 @@ import java.text.DecimalFormat;
 
 public class BookManager {
     public static boolean DataChange = false;
+    private static List<String> sCustomTag = new ArrayList<>();
 
     public static void queryAllHistory(QueryTransaction.QueryResultListCallback<HistorySearchInfo> callback) {
         SQLite.select().from(HistorySearchInfo.class)
@@ -40,6 +45,14 @@ public class BookManager {
                 .where(Book_Table.id.eq(id))
                 .async()
                 .queryResultCallback(callback)
+                .execute();
+    }
+
+    public static void queryBookByTag(QueryTransaction.QueryResultListCallback<Book> callback, String tag) {
+        SQLite.select().from(Book.class)
+                .where(Book_Table.customTag.eq(tag))
+                .async()
+                .queryListResultCallback(callback)
                 .execute();
     }
 
@@ -100,5 +113,18 @@ public class BookManager {
             }
         }
         return Double.valueOf(new DecimalFormat("0.00").format(rmbPrice));
+    }
+
+    public static List<String> getCustomTag() {
+        return sCustomTag;
+    }
+
+    public static void setCustomTag(Collection<String> customTag) {
+        sCustomTag.clear();
+        sCustomTag.addAll(customTag);
+    }
+
+    public static void setCustomOne(String customTag) {
+        sCustomTag.add(customTag);
     }
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="120dp"
+                android:minWidth="300dp"
+                android:paddingBottom="9dp">
+
+    <TextView
+        android:id="@+id/tv_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:textColor="@color/white"/>
+
+    <EditText
+        android:id="@+id/et_dialog_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_dialog_title"
+        android:layout_margin="16dp"
+        android:inputType="text"
+        tools:ignore="LabelFor"/>
+
+    <TextView
+        android:id="@+id/tv_dialog_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/et_dialog_content"
+        android:layout_marginRight="16dp"
+        android:padding="16dp"
+        android:text="确定"
+        android:textColor="@color/colorPrimary"/>
+
+    <TextView
+        android:id="@+id/tv_dialog_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_dialog_content"
+        android:layout_toLeftOf="@id/tv_dialog_confirm"
+        android:padding="16dp"
+        android:text="取消"
+        android:textColor="@color/colorPrimary"/>
+
+</RelativeLayout>
