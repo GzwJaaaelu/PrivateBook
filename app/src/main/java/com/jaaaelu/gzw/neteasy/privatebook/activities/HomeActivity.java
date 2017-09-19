@@ -1,6 +1,8 @@
 package com.jaaaelu.gzw.neteasy.privatebook.activities;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -10,8 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -42,6 +46,9 @@ import net.vrallev.android.task.TaskResult;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 
@@ -56,9 +63,10 @@ public class HomeActivity extends EventNoteBaseActivity implements BottomNavigat
     private long mLastTime = 0;
     private Notebook mNotebook;
     private List<Book> mBooks;
-    private ObjectAnimator mAnimator;
     private boolean mIsLoginFormActivity = false;
     private MyBookFragment mBookFragment;
+    private Animation mAnimation;
+    private ObjectAnimator mAnimator;
 
     /**
      * 跳转到当前 Activity
@@ -138,8 +146,6 @@ public class HomeActivity extends EventNoteBaseActivity implements BottomNavigat
             queryBook();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            cancelAnim();
         }
     }
 
@@ -220,11 +226,33 @@ public class HomeActivity extends EventNoteBaseActivity implements BottomNavigat
     }
 
     public void startAnim() {
-        mAnimator = ObjectAnimator.ofFloat(mFab, "rotation", 0, 359);
-        mAnimator.setDuration(1000);
-        mAnimator.setRepeatCount(ObjectAnimator.INFINITE);
+        mAnimator = ObjectAnimator.ofFloat(mFab, "rotation", 359, 0);
+        mAnimator.setDuration(720);
+        mAnimator.setRepeatCount(ValueAnimator.INFINITE);
         mAnimator.setInterpolator(new LinearInterpolator());
         mAnimator.start();
+
+        mAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                fabAnim(360, 0);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 
     public void cancelAnim() {
@@ -289,6 +317,10 @@ public class HomeActivity extends EventNoteBaseActivity implements BottomNavigat
             transY = UiTool.dipToPx(getResources(), 76);
         }
 
+        fabAnim(rotation, transY);
+    }
+
+    public void fabAnim(float rotation, float transY) {
         // 开始动画
         // 旋转，Y轴位移，弹性插值器，时间
         mFab.animate()
@@ -307,5 +339,10 @@ public class HomeActivity extends EventNoteBaseActivity implements BottomNavigat
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -27,7 +26,6 @@ import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +35,6 @@ import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
 import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.model.BookNote;
-import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.BookReviewDialog;
 import com.jaaaelu.gzw.neteasy.privatebook.fragments.dialog.EditTextDialogFragment;
@@ -52,7 +49,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.jaaaelu.gzw.neteasy.common.tools.UiTool.dealEmptyData;
@@ -188,32 +184,56 @@ public class BookDetailActivity extends BaseActivity implements QueryTransaction
             }
         });
 
-        mShowTag.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                App.showToast(mTagList.get(position));
-                return false;
-            }
-        });
+//        mShowTag.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if (!Book.TAG_TYPE.equals(mCurrBook.getCustomTag()) &&
+//                        !ADD_NEW_TAG.equals(mCurrBook.getCustomTag())) {
+//                    dialogEditTag(mCurrBook.getCustomTag());
+//                }
+//                return false;
+//            }
+//        });
     }
 
     private void dialogAddTag() {
-        EditTextDialogFragment fragment = EditTextDialogFragment.newInstance("添加新分类", getBookThemeColor());
-        fragment.show(getSupportFragmentManager(), "");
-        fragment.setContentListener(new EditTextDialogFragment.ChangeContentListener() {
+        dialogTag(ADD_NEW_TAG, "").setContentListener(new EditTextDialogFragment.ChangeContentListener() {
             @Override
             public void changeContent(String newContent) {
-                changeSpinnerSelect(newContent);
+                addToSpinnerSelect(newContent);
             }
         });
     }
 
-    private void changeSpinnerSelect(String newContent) {
+    private void dialogEditTag(String tag) {
+        dialogTag("编辑自定义分类", tag).setContentListener(new EditTextDialogFragment.ChangeContentListener() {
+            @Override
+            public void changeContent(String newContent) {
+                editSpinnerTag(newContent);
+            }
+        });
+    }
+
+    private EditTextDialogFragment dialogTag(String title, String content) {
+        EditTextDialogFragment fragment = EditTextDialogFragment.newInstance(title, content, getBookThemeColor());
+        fragment.show(getSupportFragmentManager(), "");
+        return fragment;
+    }
+
+    private void addToSpinnerSelect(String newContent) {
         mTagList.add(mTagList.size() - 1, newContent);
         mAdapter.notifyDataSetChanged();
         mShowTag.setSelection(mTagList.size() - 2);
 
         mCurrBook.setCustomTag(newContent);
+    }
+
+    private void editSpinnerTag(String newContent) {
+        mTagList.set(mShowTag.getSelectedItemPosition(), newContent);
+        mAdapter.notifyDataSetChanged();
+        mCurrBook.setCustomTag(newContent);
+
+        BookManager.setCustomTag(mTagList);
     }
 
     private int getBookThemeColor() {

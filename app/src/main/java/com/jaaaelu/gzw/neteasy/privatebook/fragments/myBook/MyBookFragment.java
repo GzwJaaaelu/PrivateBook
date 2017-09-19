@@ -19,6 +19,7 @@ import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
 import com.evernote.edam.type.Notebook;
 import com.jaaaelu.gzw.neteasy.common.app.EventNoteBaseFragment;
+import com.jaaaelu.gzw.neteasy.common.tools.UiTool;
 import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty;
 import com.jaaaelu.gzw.neteasy.evernote.task.GetNoteHtmlTask;
 import com.jaaaelu.gzw.neteasy.model.Book;
@@ -61,6 +62,7 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
     private ShowPrivateBookAdapter mAdapter;
     private ArrayList<String> mTagList;
     private List<String> mBookInfoList;
+    private HomeActivity mActivity;
 
     public MyBookFragment() {
         // Required empty public constructor
@@ -114,6 +116,8 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
     protected void initData() {
         super.initData();
         queryBook();
+
+        mActivity = (HomeActivity) getActivity();
     }
 
     private void queryBook() {
@@ -145,6 +149,11 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
     }
 
     private void setBookData(List<Book> tResult) {
+        if (tResult.isEmpty()) {
+            mActivity.fabAnim(0, UiTool.dipToPx(getResources(), 76));
+        } else {
+            mActivity.fabAnim(360, 0);
+        }
         mBooks.clear();
         mBooks.addAll(tResult);
         mAdapter.notifyDataSetChanged();
@@ -216,13 +225,13 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
 
     public void startQuery() {
         try {
-            ((HomeActivity) getActivity()).startAnim();
+            mActivity.startAnim();
             queryEverNoteBook();
         } catch (Exception e) {
             e.printStackTrace();
             App.showToast("数据获取失败...");
         } finally {
-            ((HomeActivity) getActivity()).cancelAnim();
+            mActivity.cancelAnim();
         }
     }
 
@@ -242,7 +251,7 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
         if (notebook != null) {
             queryEverNote();
         } else {
-            ((HomeActivity) getActivity()).cancelAnim();
+            mActivity.cancelAnim();
             App.showToast("没有为您找到同步的图书信息...");
         }
     }
@@ -275,7 +284,7 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
             bookToList(books);
             queryBookOneByOne();
         } else {
-            ((HomeActivity) getActivity()).cancelAnim();
+            mActivity.cancelAnim();
             App.showToast("没有为您找到同步的图书信息...");
         }
     }
@@ -312,6 +321,7 @@ public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefres
                 }
             });
         }
-        ((HomeActivity) getActivity()).cancelAnim();
+        mActivity.cancelAnim();
+        mActivity.fabAnim(360, 0);
     }
 }

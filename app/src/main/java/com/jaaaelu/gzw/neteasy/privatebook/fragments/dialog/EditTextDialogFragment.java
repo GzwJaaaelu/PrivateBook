@@ -41,6 +41,16 @@ public class EditTextDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    public static EditTextDialogFragment newInstance(String title, String content, int titleColor) {
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        args.putString("content", content);
+        args.putInt("titleColor", titleColor);
+        EditTextDialogFragment fragment = new EditTextDialogFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +78,8 @@ public class EditTextDialogFragment extends DialogFragment {
         mTitle.setText(getArguments().getString("title"));
         mTitle.setBackgroundColor(getArguments().getInt("titleColor"));
         mContent = (EditText) view.findViewById(R.id.et_dialog_content);
+        mContent.setText(getArguments().getString("content", ""));
+        mContent.setSelection(getArguments().getString("content", "").length());
         mContent.setSelection(getEditTextContent().length());
         mConfirm = (TextView) view.findViewById(R.id.tv_dialog_confirm);
         mCancel = (TextView) view.findViewById(R.id.tv_dialog_cancel);
