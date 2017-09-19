@@ -1,10 +1,7 @@
 package com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook;
 
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,15 +12,25 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
-import com.jaaaelu.gzw.neteasy.common.app.BaseFragment;
+import com.evernote.client.android.EvernoteSession;
+import com.evernote.client.android.login.EvernoteLoginFragment;
+import com.evernote.client.android.type.NoteRef;
+import com.evernote.edam.type.Notebook;
+import com.jaaaelu.gzw.neteasy.common.app.EventNoteBaseFragment;
 import com.jaaaelu.gzw.neteasy.common.widget.RecycleViewWithEmpty;
+import com.jaaaelu.gzw.neteasy.evernote.task.GetNoteHtmlTask;
 import com.jaaaelu.gzw.neteasy.model.Book;
+import com.jaaaelu.gzw.neteasy.net.BookRequest;
+import com.jaaaelu.gzw.neteasy.net.OnBookResultListener;
+import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
+import com.jaaaelu.gzw.neteasy.privatebook.activities.HomeActivity;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
-import com.jaaaelu.gzw.neteasy.zxing.activity.CaptureActivity;
-import com.raizlabs.android.dbflow.sql.language.CursorResult;
 import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
+
+import net.vrallev.android.task.TaskResult;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,7 +43,7 @@ import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBo
 import static com.jaaaelu.gzw.neteasy.privatebook.fragments.myBook.ShowPrivateBookAdapter.ViewType.SHOW_BY_LIST;
 
 
-public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MyBookFragment extends EventNoteBaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.rv_show_my_book)
@@ -53,6 +60,7 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
     private List<Book> mBooks;
     private ShowPrivateBookAdapter mAdapter;
     private ArrayList<String> mTagList;
+    private List<String> mBookInfoList;
 
     public MyBookFragment() {
         // Required empty public constructor
@@ -125,7 +133,7 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
             public void onListQueryResult(QueryTransaction transaction, @NonNull List<Book> tResult) {
                 setBookData(tResult);
             }
-        }, BookManager.getCustomTag().get(position - 1));
+        }, mTagList.get(position));
     }
 
     private void changeOldDBData(List<Book> tResult) {
@@ -194,19 +202,116 @@ public class MyBookFragment extends BaseFragment implements SwipeRefreshLayout.O
     }
 
     @OnClick(R.id.iv_go_add_book)
-    public void onAddBook() {
-        //  进行权限校验后跳转至二维码界面
-        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)) {
-            CaptureActivity.show(getActivity());
+    public void onSyncBook() {
+        loginEventNote();
+    }
+
+    private void loginEventNote() {
+        if (EvernoteSession.getInstance().isLoggedIn()) {
+            startQuery();
         } else {
-            requestPermissions(new String[]{Manifest.permission.CAMERA},
-                    MY_PERMISSIONS_REQUEST_READ_CAMERA);
+            EvernoteSession.getInstance().authenticate(getActivity());
         }
+    }
+
+    public void startQuery() {
+        try {
+            ((HomeActivity) getActivity()).startAnim();
+            queryEverNoteBook();
+        } catch (Exception e) {
+            e.printStackTrace();
+            App.showToast("数据获取失败...");
+        } finally {
+            ((HomeActivity) getActivity()).cancelAnim();
+        }
+    }
+
+    @Override
+    protected void onQueryNoteBookException() {
+        App.showToast("数据获取失败...");
     }
 
     @Override
     public void onRefresh() {
         queryBook();
         mRefreshLayout.setRefreshing(true);
+    }
+
+    @Override
+    protected void doSomethingWhenGetNoteBook(Notebook notebook) {
+        if (notebook != null) {
+            queryEverNote();
+        } else {
+            ((HomeActivity) getActivity()).cancelAnim();
+            App.showToast("没有为您找到同步的图书信息...");
+        }
+    }
+
+    /**
+     * 找到笔记时回调
+     *
+     * @param noteRefList 笔记列表
+     */
+    @TaskResult(id = QUERY_NOTE_BOOK_ID)
+    public void onFindNotes(List<NoteRef> noteRefList) {
+        for (NoteRef ref : noteRefList) {
+            if ("私人藏书图书信息同步".equals(ref.getTitle())) {
+                new GetNoteHtmlTask(ref).start(getActivity(), "html");
+            }
+        }
+    }
+
+    /**
+     * 查询到笔记内容时回调
+     *
+     * @param html 页面
+     * @param task 对应任务
+     */
+    @TaskResult(id = "html")
+    public void onGetNoteContentHtml(String html, GetNoteHtmlTask task) {
+        String[] books = html.split("<br/>");
+        //  掐头去尾
+        if (books.length > 2) {
+            bookToList(books);
+            queryBookOneByOne();
+        } else {
+            ((HomeActivity) getActivity()).cancelAnim();
+            App.showToast("没有为您找到同步的图书信息...");
+        }
+    }
+
+    private List<String> bookToList(String[] books) {
+        mBookInfoList = new ArrayList<>();
+        for (int i = 1; i < books.length - 1; i++) {
+            mBookInfoList.add(books[i]);
+        }
+        return mBookInfoList;
+    }
+
+    private void queryBookOneByOne() {
+        for (int i = 0; i < mBookInfoList.size(); i++) {
+            String isbn = mBookInfoList.get(i).split("-")[1];
+            final int finalI = i;
+            BookRequest.getInstance().queryBookByISBN(isbn, new OnBookResultListener<Book>() {
+                @Override
+                public void onSuccess(Book book) {
+                    book.setCustomTag(mBookInfoList.get(finalI).split("-")[2]);
+                    book.setReadState(Integer.valueOf(mBookInfoList.get(finalI).split("-")[3]));
+                    BookManager.saveBook(book);
+                    mBooks.add(book);
+
+                    if (finalI == mBookInfoList.size() - 1) {
+                        addTag();
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                }
+            });
+        }
+        ((HomeActivity) getActivity()).cancelAnim();
     }
 }

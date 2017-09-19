@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">common</string>
-    <string name="hint_private_book_nothing">暂时还没有藏书，快去添加要收藏图书吧！\n 可点击图片进行书名搜索或二维码扫描~</string>
+    <string name="hint_private_book_nothing">暂时还没有藏书，快去添加要收藏图书吧！\n 如果图书信息已存至印象笔记可点击图片进行同步~</string>
     <string name="contents_contact">Contact info</string>
     <string name="contents_email">Email address</string>
     <string name="contents_location">Geographic coordinates</string>

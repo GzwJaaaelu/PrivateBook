@@ -150,7 +150,7 @@ public class NavHelper<T> {
         //  额外的信息，用户存些什么都行
         public T extra;
         //  内部缓存的对应 Fragment
-        Fragment fragment;
+        public Fragment fragment;
 
         public Tab(Class<?> clx, T extra) {
             this.clx = clx;

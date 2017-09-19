@@ -3,23 +3,29 @@ package com.jaaaelu.gzw.neteasy.privatebook.activities;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
-import com.jaaaelu.gzw.neteasy.common.app.BaseActivity;
+import com.evernote.client.android.EvernoteSession;
+import com.evernote.client.android.login.EvernoteLoginFragment;
+import com.evernote.client.android.type.NoteRef;
+import com.evernote.edam.type.Note;
+import com.evernote.edam.type.Notebook;
+import com.jaaaelu.gzw.neteasy.common.app.EventNoteBaseActivity;
 import com.jaaaelu.gzw.neteasy.common.tools.UiTool;
 import com.jaaaelu.gzw.neteasy.common.widget.ConfirmDialogFragment;
+import com.jaaaelu.gzw.neteasy.evernote.task.CreateNewNoteTask;
+import com.jaaaelu.gzw.neteasy.evernote.task.DeleteNoteTask;
+import com.jaaaelu.gzw.neteasy.model.Book;
 import com.jaaaelu.gzw.neteasy.privatebook.App;
 import com.jaaaelu.gzw.neteasy.privatebook.MainActivity;
 import com.jaaaelu.gzw.neteasy.privatebook.R;
@@ -30,22 +36,29 @@ import com.jaaaelu.gzw.neteasy.privatebook.helper.NavHelper;
 import com.jaaaelu.gzw.neteasy.privatebook.helper.SharePreferencesHelper;
 import com.jaaaelu.gzw.neteasy.util.BookManager;
 import com.jaaaelu.gzw.neteasy.util.Dateutil;
+import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransaction;
 
+import net.vrallev.android.task.TaskResult;
+
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-
-import static android.animation.Animator.DURATION_INFINITE;
 
 
-public class HomeActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener, NavHelper.OnTabChangedListener<Integer> {
+public class HomeActivity extends EventNoteBaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        NavHelper.OnTabChangedListener<Integer>, EvernoteLoginFragment.ResultCallback {
     @BindView(R.id.fab_action)
-    FloatingActionButton mFab;
+    ImageButton mFab;
     private NavHelper<Integer> mNavHelper;
     private BottomNavigationView mBottomNavigation;
     private static final int DOUBLE_EXIT_TIME = 1500;
     private long mLastTime = 0;
+    private Notebook mNotebook;
+    private List<Book> mBooks;
+    private ObjectAnimator mAnimator;
+    private boolean mIsLoginFormActivity = false;
+    private MyBookFragment mBookFragment;
 
     /**
      * 跳转到当前 Activity
@@ -79,6 +92,7 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsLoginFormActivity = true;
                 syncBook();
             }
         });
@@ -90,14 +104,146 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
         fragment.onConfirmClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ObjectAnimator animator = ObjectAnimator.ofFloat(mFab, "rotation", 0, 359);
-                animator.setDuration(1000);
-                animator.setRepeatCount(ObjectAnimator.INFINITE);
-                animator.setInterpolator(new LinearInterpolator());
-                animator.start();
                 fragment.dismiss();
+                loginEventNote();
             }
         });
+    }
+
+    private void loginEventNote() {
+        if (EvernoteSession.getInstance().isLoggedIn()) {
+            startAnimAndSync();
+        } else {
+            EvernoteSession.getInstance().authenticate(this);
+        }
+    }
+
+    @Override
+    public void onLoginFinished(boolean successful) {
+        if (successful) {
+            if (!mIsLoginFormActivity && mBookFragment != null) {
+                mBookFragment.startQuery();
+            } else if (mIsLoginFormActivity) {
+                startAnimAndSync();
+                mIsLoginFormActivity = false;
+            }
+        } else {
+            Toast.makeText(this, "授权失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void startAnimAndSync() {
+        try {
+            startAnim();
+            queryBook();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cancelAnim();
+        }
+    }
+
+    private void startSync() {
+        StringBuilder content = new StringBuilder("私人藏书图书信息同步<br/>");
+        for (Book book : mBooks) {
+            content.append("    ")
+                    .append(book.getTitle())
+                    .append("-")
+                    .append(book.getIsbn13())
+                    .append("-")
+                    .append(book.getCustomTag())
+                    .append("-")
+                    .append(book.getReadState())
+                    .append("-")
+                    .append("<a href='")
+                    .append(book.getAlt())
+                    .append("'>《")
+                    .append(book.getTitle())
+                    .append("》</a>")
+                    .append("<br/>");
+        }
+
+        createNewNote("私人藏书图书信息同步", content.toString(), null);
+    }
+
+    private void queryBook() {
+        BookManager.queryAllBook(new QueryTransaction.QueryResultListCallback<Book>() {
+            @Override
+            public void onListQueryResult(QueryTransaction transaction, @NonNull List<Book> tResult) {
+                mBooks = tResult;
+                queryEverNoteBook();
+            }
+        });
+    }
+
+    @Override
+    protected void onQueryNoteBookException() {
+        cancelAnim();
+        App.showToast("同步失败...");
+    }
+
+    /**
+     * 找到笔记时回调
+     *
+     * @param noteRefList 笔记列表
+     */
+    @TaskResult(id = QUERY_NOTE_BOOK_ID)
+    public void onFindNotes(List<NoteRef> noteRefList) {
+        for (NoteRef ref : noteRefList) {
+            if ("私人藏书图书信息同步".equals(ref.getTitle())) {
+                new DeleteNoteTask(ref).start(this);
+            }
+        }
+        startSync();
+    }
+
+    @Override
+    protected void doSomethingWhenGetNoteBook(Notebook notebook) {
+        mNotebook = notebook;
+        queryEverNote();
+    }
+
+    /**
+     * 创建笔记
+     *
+     * @param title     标题
+     * @param content   内容
+     * @param imageData 图片数据
+     */
+    public void createNewNote(String title, String content, CreateNewNoteTask.ImageData imageData) {
+        if (mNotebook == null) {
+            cancelAnim();
+            App.showToast("同步失败...");
+            return;
+        }
+        new CreateNewNoteTask(title, content, imageData, mNotebook, null).start(this);
+    }
+
+    public void startAnim() {
+        mAnimator = ObjectAnimator.ofFloat(mFab, "rotation", 0, 359);
+        mAnimator.setDuration(1000);
+        mAnimator.setRepeatCount(ObjectAnimator.INFINITE);
+        mAnimator.setInterpolator(new LinearInterpolator());
+        mAnimator.start();
+    }
+
+    public void cancelAnim() {
+        mAnimator.cancel();
+    }
+
+    /**
+     * 创建笔记时回调
+     *
+     * @param note 创建的笔记
+     */
+    @TaskResult
+    public void onCreateNewNote(Note note) {
+        cancelAnim();
+        if (note != null) {
+            App.showToast("同步完成...");
+        } else {
+            App.showToast("同步失败...");
+        }
     }
 
     @Override
@@ -138,6 +284,7 @@ public class HomeActivity extends BaseActivity implements BottomNavigationView.O
         if (Objects.equals(newTab.extra, R.string.title_my_book)) {
             //  主界面时显示
             rotation = 360;
+            mBookFragment = (MyBookFragment) newTab.fragment;
         } else {
             transY = UiTool.dipToPx(getResources(), 76);
         }

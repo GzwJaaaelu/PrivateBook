@@ -24,7 +24,7 @@
         android:layout_above="@id/nbv_navigation"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <ImageButton
         android:id="@+id/fab_action"
         android:layout_width="52dp"
         android:layout_height="52dp"
@@ -33,7 +33,8 @@
         android:layout_marginBottom="68dp"
         android:layout_marginEnd="16dp"
         android:backgroundTint="@color/colorPrimary"
-        app:srcCompat="@drawable/ic_sync"/>
+        app:srcCompat="@drawable/ic_sync"
+        android:contentDescription="@string/app_name"/>
 
 </RelativeLayout>
 

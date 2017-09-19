@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         app:pv_background_color="?attr/colorPrimary"
         app:pv_host_text="私人藏书"
-        app:pv_particle_text="1.1"
+        app:pv_particle_text="1.6"
         app:pv_particle_text_size="16sp"
         app:pv_host_text_size="16sp"
         app:pv_text_color="#FFF"/>
